@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\MOdels\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
@@ -11,36 +11,40 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     public function mostrarLogin(){
-        return "Mau, CONECTA AQUÍ LA VISTA AL LOGIN";
+        return view('auth.login');
     }
 
     public function procesarLogin(Request $request){
         try{
-            $credenciales = $request->validate([
+            $request->validate([
                 'email'     => 'required|email',
                 'password'  => 'required'
             ]);
 
-            if(Auth::attempt($credenciales)){
+            // 1. Buscamos al usuario en la base de datos por su correo
+            $usuario = User::where('email', $request->email)->first();
+
+            // 2. Verificamos si el usuario existe y si la contraseña coincide
+            if ($usuario && Hash::check($request->password, $usuario->password)) {
+
+                // 3. Autenticamos al usuario manualmente
+                Auth::login($usuario);
                 $request->session()->regenerate();
 
-                return response()->json([
-                    'estado'    => 'Éxito', 
-                    'mensaje'   => 'Bienvenido a UPEMarket, ' .Auth::user()->nombre
-                ]);
+                return redirect()->intended('/publicaciones');
             }
 
-            //contraseña incorrecta
-            return response()->json([
-                'estado'    => 'Error de autenticación',
-                'mensaje'   => 'Usuario y/o contraseña incorrectos.'
-            ], 401);
+            // Credenciales incorrectas: regresa al formulario con el error visible
+            return back()->withErrors([
+                'email' => 'El correo o la contraseña son incorrectos.',
+            ])->onlyInput('email');
+
+        } catch(ValidationException $e){
+            return back()->withErrors($e->errors())->onlyInput('email');
         } catch(\Exception $e){
-            return response()->json([
-                'estado'    => 'Error del servidor',
-                'mensaje'   => 'Inicio de sesión fallido',
-                'detalle'   => $e->getMessage()
-            ], 500);
+            return back()->withErrors([
+                'email' => 'Error del servidor al iniciar sesión: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -50,19 +54,15 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response->json([
-            'estado'    => 'Éxito',
-            'mensaje'   => 'Sesión cerrada con éxito'
-        ]);
+        return redirect('/login');
     }
 
     public function mostrarRegistro(){
-        return "Conexión a la vista";
+        return view('auth.register');
     }
 
     public function procesarRegistro(Request $request){
         try{
-            //validaciones
             $request->validate([
                 'nombre'    => 'required|string|max:255',
                 'email'     => ['required', 'email', 'ends_with:@upemor.edu.mx'],
@@ -71,40 +71,25 @@ class AuthController extends Controller
                 'telefono'  => 'nullable|numeric|digits:10'
             ]);
 
-            //CReación del user
             $usuario = new User();
             $usuario->nombre = $request->nombre;
-            $usuario->email = $request->correo;
+            $usuario->email = $request->email;
             $usuario->carrera = $request->carrera;
             $usuario->telefono = $request->telefono;
-
-            //asignación de rol (estudiante)
             $usuario->rol = 'estudiante';
             $usuario->activo = true;
-            
-            // cifrado de password
             $usuario->password = Hash::make($request->password);
             $usuario->save();
 
-            return response()->json([
-                'estado'    => 'Éxito',
-                'mensaje'   => 'Usuario registrado correctamente'
-            ]);
+            Auth::login($usuario);
+            $request->session()->regenerate();
+
+            return redirect('/publicaciones');
 
         } catch(ValidationException $e){
-            //valida correo o campos vacios
-            return response()->json([
-                'estado'    => 'Error de validación',
-                'detalles'  => $e->errors()
-            ], 422);
-
+            return back()->withErrors($e->errors())->withInput();
         } catch(\Exception $e){
-            //eroores del sistema
-            return response()->json([
-                'estado'    => 'Error del servidor',
-                'mensaje'   => 'NO se pudo registrar al usuario',
-                'detalles'  => $e->getMessage()
-            ], 500);
+            return back()->withErrors(['error' => 'Error del servidor: ' . $e->getMessage()])->withInput();
         }
     }
 }

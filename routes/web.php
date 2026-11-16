@@ -10,17 +10,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//====================== LOGIN ========================
+// ====================== LOGIN ========================
 Route::get('/login', [AuthController::class, 'mostrarLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'procesarLogin']);
 
-// ================= formulario de registro de usaurios ===================
+// ================= REGISTRO DE USUARIOS ===================
 Route::get('/registro', [AuthController::class, 'mostrarRegistro']);
 Route::post('/registro', [AuthController::class, 'procesarRegistro']);
 
-
 Route::middleware('auth')->group(function (){
-    /*==============CRUD PUBLICACIONES==================*/
+    /*============== CRUD PUBLICACIONES ==================*/
     Route::get('/publicaciones', [PublicacionController::class, 'consultar']);
     Route::post('/publicaciones', [PublicacionController::class, 'crear']);
     Route::put('/publicaciones/{id}', [PublicacionController::class, 'actualizar']);

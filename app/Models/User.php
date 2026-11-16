@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    use Notifiable;
+
     protected $connection = 'mongodb';
-    protected $collection = 'usuarios';
+    protected $collection = 'users';
 
     protected $fillable = [
         'nombre',
@@ -27,29 +30,4 @@ class User extends Authenticatable
     protected $casts = [
         'activo' => 'boolean',
     ];
-
-    public function publicaciones()
-    {
-        return $this->hasMany(Publicacion::class, 'usuario_id');
-    }
-
-    public function favoritos()
-    {
-        return $this->hasMany(Favorito::class, 'usuario_id');
-    }
-
-    public function conversacionesComoComprador()
-    {
-        return $this->hasMany(Conversacion::class, 'comprador_id');
-    }
-
-    public function conversacionesComoVendedor()
-    {
-        return $this->hasMany(Conversacion::class, 'vendedor_id');
-    }
-
-    public function reportes()
-    {
-        return $this->hasMany(Reporte::class, 'reportado_por');
-    }
 }

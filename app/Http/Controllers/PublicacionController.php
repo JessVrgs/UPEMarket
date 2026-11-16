@@ -40,18 +40,11 @@ class PublicacionController extends Controller
 
             //consulta final en MongoDB Atlas
             $publicaciones = $query->get();
-            
-            return response()->json([
-                'estado' => 'Éxito', 
-                'total_resultados' => $publicaciones->count(),
-                'datos' => $publicaciones
-            ]);
-            
+
+            return view('publications.index');
+
         } catch(\Exception $e){
-            return response()->json([
-                'estado'    => 'Error', 
-                'mensaje'   => 'Error al cargar las publicaciones'
-            ], 500);
+            return view('publications.index', 500);
         }
     }
 
@@ -73,7 +66,7 @@ class PublicacionController extends Controller
                 $rutaFoto = $request->file('foto')->store('productos', 'public');
             }
 
-            // crwación 
+            // crwación
             $publicacion = new Publicacion();
             $publicacion->titulo = $request->titulo;
             $publicacion->precio = $request->precio;
@@ -91,20 +84,20 @@ class PublicacionController extends Controller
             $publicacion->save();
 
             return response()->json([
-                'estado' => 'Éxito', 
+                'estado' => 'Éxito',
                 'mensaje' => 'Producto publicado.'
             ]);
 
         } catch(ValidationException $e){
             return response()->json([
-                'estado' => 'Error de validación', 
+                'estado' => 'Error de validación',
                 'detalles' => $e->errors()
             ], 422);
 
         } catch (\Exception $e) {
             return response()->json([
-                'estado' => 'Error', 
-                'mensaje' => 'No se pudo guardar.', 
+                'estado' => 'Error',
+                'mensaje' => 'No se pudo guardar.',
                 'detalle' => $e->getMessage()
             ], 500);
         }
@@ -117,7 +110,7 @@ class PublicacionController extends Controller
 
             if(!$publicacion){
                 return respose()->json([
-                    'estado'    => 'Error', 
+                    'estado'    => 'Error',
                     'mensaje'   => 'Publicación no encontrada.'
                 ], 404);
             }
@@ -134,7 +127,7 @@ class PublicacionController extends Controller
             $publicacion->save();
 
             return response()->json([
-                'estado'    => 'Éxito', 
+                'estado'    => 'Éxito',
                 'mensaje'   => 'Publicación actualizada exitosamente.'
             ]);
         } catch(\Exception $e){
@@ -157,7 +150,7 @@ class PublicacionController extends Controller
                 ], 404);
             }
 
-            //solo el propietario puede eliminar su publicación 
+            //solo el propietario puede eliminar su publicación
             if($request->usuario_id != $publicacion->usuario_id){
                 return response()->json([
                     'estado'    => 'Denegado',

@@ -1,4 +1,10 @@
-<x-layout title="UPEMARKET | INICIO DE SESIÓN">
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UPEMARKET | INICIO DE SESIÓN</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo-completo-upemarket.png') }}">
     <style>
         body {
             margin: 0;
@@ -38,6 +44,7 @@
             width: 100%;
             max-width: 400px;
             text-align: center;
+            box-sizing: border-box;
         }
 
         .login-card img {
@@ -50,9 +57,11 @@
             color: white;
             text-align: center;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
@@ -60,6 +69,7 @@
             color: white;
             text-align: center;
         }
+
         .form-group input {
             width: 100%;
             padding: 10px 12px;
@@ -71,14 +81,17 @@
             box-sizing: border-box;
             text-align: center;
         }
+
         .form-group input::placeholder {
             color: rgba(255, 255, 255, 0.7);
         }
+
         .form-group input:focus {
             outline: none;
             border-color: white;
-            box-shadow: none; /* Elimina el contorno al seleccionar el campo */
+            box-shadow: none;
         }
+
         .btn-submit {
             width: 100%;
             background-color: white;
@@ -89,49 +102,56 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, color 0.2s;
         }
+
         .btn-submit:hover {
             background-color: black;
             color: white;
         }
+
         .error-message {
             color: #ffcccc;
             font-size: 13px;
             margin-top: 5px;
         }
     </style>
+</head>
+<body>
 
-    <div class="login-card">
-        <!-- Logo corregido con src -->
-        <img src="{{ asset('img/Logo Completo UPEMarket.png') }}" alt="Logo UPEMarket">
-        <h2>Iniciar Sesión</h2>
+<div class="login-card">
+    <!-- Logo corregido con src -->
+    <img src="{{ asset('img/Logo Completo UPEMarket.png') }}" alt="Logo UPEMarket">
+    <h2>Iniciar Sesión</h2>
 
-        <!-- Formulario apuntando a la ruta POST /login -->
-        <form action="{{ url('/login') }}" method="POST">
-            @csrf
+    <!-- Formulario apuntando a la ruta POST /login -->
+    <form action="{{ url('/login') }}" method="POST">
+        @csrf
 
-            <div class="form-group">
-                <label for="email">Correo Electrónico</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus placeholder="tucorreo@upemor.edu.mx">
-                @error('email')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-            </div>
+        <div class="form-group">
+            <label for="email">Correo Electrónico</label>
+            <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus placeholder="tucorreo@upemor.edu.mx">
+            @error('email')
+            <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required placeholder="********">
-                @error('password')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-            </div>
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" required placeholder="********">
+            @error('password')
+            <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-            <button type="submit" class="btn-submit">Ingresar</button>
-        </form>
-        <p style="margin-top: 20px; font-size: 14px; color: white;">
-            ¿No tienes cuenta?
-            <a href="{{ url('/registro') }}" style="color: white; font-weight: bold; text-decoration: underline;">Regístrate</a>
-        </p>
-    </div>
-</x-layout>
+        <button type="submit" class="btn-submit">Ingresar</button>
+    </form>
+
+    <p style="margin-top: 20px; font-size: 14px; color: white;">
+        ¿No tienes cuenta?
+        <a href="{{ url('/registro') }}" style="color: white; font-weight: bold; text-decoration: underline;">Regístrate</a>
+    </p>
+</div>
+
+</body>
+</html>

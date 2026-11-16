@@ -11,10 +11,7 @@ class CategoriaController extends Controller
         try{
             $categorias = Categoria::orderBy('nombre', 'asc')->get();
 
-            return response()->json([
-                'estado'    => 'Éxito',
-                'datos'   => $categorias
-            ]);
+            return view('category.index');
         } catch(\Exception $e){
             return response()->json([
                 'estado'    => 'Error',

@@ -9,21 +9,20 @@ use Illuminate\Validation\ValidationException;
 class PublicacionController extends Controller
 {
     public function consultar(Request $request){
-        //Publicaciones no ocultas ordenadas por la fecha más reciente
         try{
             $query = Publicacion::where('oculta', false);
 
-            //busqueda por nombre
+            // Búsqueda por título
             if($request->filled('buscar')){
-                $query->where('titulo', 'like', '%' .$request->buscar . '%');
+                $query->where('titulo', 'like', '%' . $request->buscar . '%');
             }
 
-            //busca por categoría
+            // Búsqueda por categoría
             if ($request->filled('categoria_id')) {
                 $query->where('categoria_id', $request->categoria_id);
             }
 
-            //filtrar por precio (mínimo y máximo) OPCIONAL SI MAU LO IMPLEMENTA
+            // Filtrar por precio mínimo y máximo
             if ($request->filled('precio_min')) {
                 $query->where('precio', '>=', (float) $request->precio_min);
             }
@@ -31,98 +30,107 @@ class PublicacionController extends Controller
                 $query->where('precio', '<=', (float) $request->precio_max);
             }
 
-            // ordenar por precio (ascendente o descendente)
+            // Ordenar por precio o fecha
             if ($request->filled('orden_precio') && in_array($request->orden_precio, ['asc', 'desc'])) {
                 $query->orderBy('precio', $request->orden_precio);
             } else {
                 $query->orderBy('created_at', 'desc');
             }
 
-            //consulta final en MongoDB Atlas
+            // Consulta final en MongoDB Atlas
             $publicaciones = $query->get();
 
-            return view('publications.index');
+            // Pasamos la variable $publicaciones a la vista para que el @forelse funcione
+            return view('publications.index', compact('publicaciones'));
 
         } catch(\Exception $e){
-            return view('publications.index', 500);
+            return view('publications.index', ['publicaciones' => collect()])->with('error', 'Error al cargar las publicaciones.');
         }
     }
 
     public function crear(Request $request){
         try{
-            // validaciones
+            // Validaciones
             $request->validate([
-                'titulo'    => 'required|string|max:100',
-                'precio'    => 'required|numeric|min:0',
-                'descripcion' => 'required|string',
-                'categoria_id'=> 'required|string',
-                'foto'      => 'required|image|mimes:jpeg,png,jpg|max:2048'
+                'titulo'        => 'required|string|max:100',
+                'precio'        => 'required|numeric|min:0',
+                'descripcion'   => 'required|string',
+                'categoria_id'  => 'required|string',
+                'foto'          => 'required|file|image|mimes:jpeg,png,jpg,webp|max:10240' // Subido a 10MB y flexible
             ]);
 
-            //PROCESAR FOTOGRAFÍAS
+            // Procesar fotografía
             $rutaFoto = null;
             if($request->hasFile('foto')){
-                //la foto se guarda en la carpeta storage/app/public/productos
-                $rutaFoto = $request->file('foto')->store('productos', 'public');
+                // La foto se guarda en storage/app/public/productos
+                $path = $request->file('foto')->store('productos', 'public');
+                // Guardamos la ruta pública accesible (storage/productos/...)
+                $rutaFoto = asset('storage/' . $path);
             }
 
-            // crwación
+            // Creación del registro
             $publicacion = new Publicacion();
             $publicacion->titulo = $request->titulo;
             $publicacion->precio = $request->precio;
             $publicacion->descripcion = $request->descripcion;
             $publicacion->categoria_id = $request->categoria_id;
 
-            //la ruta de la imagen se guarda en MongoDB
-            $publicacion->fotos = $rutaFoto;
+            // Usamos 'foto' en singular para que coincida perfectamente
+            $publicacion->foto = $rutaFoto;
 
-            //asignación del usuario desde su sesión activa
-            $publicacion->usuario_id = auth()->user()->id;
+            // Asignación del usuario desde su sesión activa
+            $publicacion->usuario_id = auth()->id();
 
             $publicacion->estado = 'disponible';
             $publicacion->oculta = false;
             $publicacion->save();
 
-            return response()->json([
-                'estado' => 'Éxito',
-                'mensaje' => 'Producto publicado.'
-            ]);
+            // Redirección exitosa de vuelta a la lista de publicaciones
+            return redirect('/publicaciones')->with('success', '¡Artículo publicado con éxito!');
 
         } catch(ValidationException $e){
-            return response()->json([
-                'estado' => 'Error de validación',
-                'detalles' => $e->errors()
-            ], 422);
+            return back()->withErrors($e->errors())->withInput();
 
         } catch (\Exception $e) {
-            return response()->json([
-                'estado' => 'Error',
-                'mensaje' => 'No se pudo guardar.',
-                'detalle' => $e->getMessage()
-            ], 500);
+            return back()->withErrors(['error' => 'No se pudo guardar: ' . $e->getMessage()])->withInput();
         }
     }
 
-    //cambiar el estatus de una publicación y/o datos
+    public function mostrar($id)
+    {
+        try {
+            $publicacion = Publicacion::with('usuario')->find($id);
+
+            if (!$publicacion || $publicacion->oculta) {
+                return redirect('/publicaciones')->with('error', 'La publicación no existe o ya no está disponible.');
+            }
+
+            return view('publications.show', compact('publicacion'));
+
+        } catch (\Exception $e) {
+            return redirect('/publicaciones')->with('error', 'Error al cargar los detalles del artículo.');
+        }
+    }
+
+    // Cambiar el estatus de una publicación y/o datos
     public function actualizar(Request $request, $id){
         try{
             $publicacion = Publicacion::find($id);
 
             if(!$publicacion){
-                return respose()->json([
+                return response()->json([
                     'estado'    => 'Error',
                     'mensaje'   => 'Publicación no encontrada.'
                 ], 404);
             }
 
-            if($request->usuario_id != $publicacion->usuario_id){
+            if($request->user()->id != $publicacion->usuario_id){
                 return response()->json([
                     'estado'    => 'Denegado',
                     'mensaje'   => 'Permiso denegado, esta publicación no te pertenece.'
                 ], 403);
             }
 
-            //cambio de estado de publicación
             $publicacion->estado = $request->estado ?? $publicacion->estado;
             $publicacion->save();
 
@@ -142,7 +150,6 @@ class PublicacionController extends Controller
         try{
             $publicacion = Publicacion::find($id);
 
-            //verifica si existe
             if(!$publicacion){
                 return response()->json([
                     'estado'    => 'Error',
@@ -150,8 +157,7 @@ class PublicacionController extends Controller
                 ], 404);
             }
 
-            //solo el propietario puede eliminar su publicación
-            if($request->usuario_id != $publicacion->usuario_id){
+            if($request->user()->id != $publicacion->usuario_id){
                 return response()->json([
                     'estado'    => 'Denegado',
                     'mensaje'   => 'Solo el propietario puede eliminar su propia publicación.'
@@ -159,10 +165,7 @@ class PublicacionController extends Controller
             }
 
             $publicacion->delete();
-            return response()->json([
-                'estado'    => 'Éxito',
-                'mensaje'   => 'Publicación eliminada correctamente'
-            ]);
+            return view('publications.my_posts');
 
         } catch(\Exception $e){
             return response()->json([

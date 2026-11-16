@@ -1,4 +1,10 @@
-<x-layout title="UPEMARKET | REGISTRO">
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UPEMARKET | REGISTRO</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo-completo-upemarket.png') }}">
     <style>
         body {
             margin: 0;
@@ -18,7 +24,7 @@
         /* Capa translúcida para suavizar el fondo */
         body::before {
             content: "";
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -39,6 +45,7 @@
             max-width: 450px;
             text-align: center;
             margin: 20px 0;
+            box-sizing: border-box;
         }
 
         .register-card img {
@@ -91,7 +98,7 @@
         .form-group input:focus {
             outline: none;
             border-color: white;
-            box-shadow: none; /* Elimina el contorno al seleccionar el campo */
+            box-shadow: none;
         }
 
         .btn-submit {
@@ -104,7 +111,7 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, color 0.2s;
             margin-top: 10px;
         }
 
@@ -132,60 +139,64 @@
             text-decoration: underline;
         }
     </style>
+</head>
+<body>
 
-    <div class="register-card">
-        <img src="{{ asset('img/Logo Completo UPEMarket.png') }}" alt="Logo UPEMarket">
-        <h2>Registro de Usuario</h2>
+<div class="register-card">
+    <img src="{{ asset('img/Logo Completo UPEMarket.png') }}" alt="Logo UPEMarket">
+    <h2>Registro de Usuario</h2>
 
-        <!-- Formulario apuntando a la ruta POST /registro -->
-        <form action="{{ url('/registro') }}" method="POST">
-            @csrf
+    <!-- Formulario apuntando a la ruta POST /registro -->
+    <form action="{{ url('/registro') }}" method="POST">
+        @csrf
 
-            <div class="form-group">
-                <label for="nombre">Nombre Completo</label>
-                <input type="text" id="nombre" name="nombre" value="{{ old('nombre') }}" required autofocus placeholder="ej. Juan Perez">
-                @error('nombre')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="email">Correo Institucional</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="correo@upemor.edu.mx">
-                @error('email')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="carrera">Carrera</label>
-                <input type="text" id="carrera" name="carrera" value="{{ old('carrera') }}" required placeholder="ej. IID, IFI">
-                @error('carrera')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="telefono">Teléfono (10 dígitos)</label>
-                <input type="tel" id="telefono" name="telefono" value="{{ old('telefono') }}" placeholder="ej. 7771234567">
-                @error('telefono')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required placeholder="Min. 6 caracteres">
-                @error('password')
-                <div class="error-message">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <button type="submit" class="btn-submit">Registrarse</button>
-        </form>
-
-        <div class="login-link">
-            ¿Ya tienes cuenta? <a href="{{ url('/login') }}">Inicia Sesión</a>
+        <div class="form-group">
+            <label for="nombre">Nombre Completo</label>
+            <input type="text" id="nombre" name="nombre" value="{{ old('nombre') }}" required autofocus placeholder="ej. Juan Perez">
+            @error('nombre')
+            <div class="error-message">{{ $message }}</div>
+            @enderror
         </div>
+
+        <div class="form-group">
+            <label for="email">Correo Institucional</label>
+            <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="correo@upemor.edu.mx">
+            @error('email')
+            <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="carrera">Carrera</label>
+            <input type="text" id="carrera" name="carrera" value="{{ old('carrera') }}" required placeholder="ej. IID, IFI">
+            @error('carrera')
+            <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">Teléfono (10 dígitos)</label>
+            <input type="tel" id="telefono" name="telefono" value="{{ old('telefono') }}" placeholder="ej. 7771234567">
+            @error('telefono')
+            <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" required placeholder="Min. 6 caracteres">
+            @error('password')
+            <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <button type="submit" class="btn-submit">Registrarse</button>
+    </form>
+
+    <div class="login-link">
+        ¿Ya tienes cuenta? <a href="{{ url('/login') }}">Inicia Sesión</a>
     </div>
-</x-layout>
+</div>
+
+</body>
+</html>

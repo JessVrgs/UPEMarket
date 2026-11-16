@@ -15,7 +15,8 @@ class Publicacion extends Model
         'titulo',
         'descripcion',
         'precio',
-        'fotos',
+        'foto',      // <-- Actualizado a singular para que coincida con el controlador
+        'fotos',     // <-- Lo dejamos por compatibilidad por si usas ambos
         'estado',
         'oculta',
     ];

@@ -15,36 +15,32 @@ class AuthController extends Controller
     }
 
     public function procesarLogin(Request $request){
-        try{
+        try {
             $request->validate([
                 'email'     => 'required|email',
                 'password'  => 'required'
             ]);
 
-            // 1. Buscamos al usuario en la base de datos por su correo
+            // Buscamos al usuario
             $usuario = User::where('email', $request->email)->first();
 
-            // 2. Verificamos si el usuario existe y si la contraseña coincide
-            if ($usuario && Hash::check($request->password, $usuario->password)) {
-
-                // 3. Autenticamos al usuario manualmente
-                Auth::login($usuario);
-                $request->session()->regenerate();
-
-                return redirect()->intended('/publicaciones');
+            // 🔍 LÍNEA DE DEPURACIÓN (Míralo en pantalla o con dd)
+            if (!$usuario) {
+                return back()->withErrors(['email' => 'El correo no existe en la base de datos.']);
             }
 
-            // Credenciales incorrectas: regresa al formulario con el error visible
-            return back()->withErrors([
-                'email' => 'El correo o la contraseña son incorrectos.',
-            ])->onlyInput('email');
+            // Verificamos si la contraseña coincide con el Hash de MongoDB
+            if (Hash::check($request->password, $usuario->password)) {
+                Auth::login($usuario);
+                $request->session()->regenerate();
+                return redirect()->intended('/publicaciones');
+            } else {
+                // Si entra aquí, la contraseña ingresada no coincide con el hash guardado
+                return back()->withErrors(['email' => 'La contraseña no coincide con el registro (Hash inválido o texto plano).']);
+            }
 
-        } catch(ValidationException $e){
-            return back()->withErrors($e->errors())->onlyInput('email');
         } catch(\Exception $e){
-            return back()->withErrors([
-                'email' => 'Error del servidor al iniciar sesión: ' . $e->getMessage()
-            ]);
+            return back()->withErrors(['email' => 'Error: ' . $e->getMessage()]);
         }
     }
 
@@ -71,6 +67,12 @@ class AuthController extends Controller
                 'telefono'  => 'nullable|numeric|digits:10'
             ]);
 
+            // Validación adicional por si el correo ya está registrado en MongoDB
+            $existe = User::where('email', $request->email)->first();
+            if ($existe) {
+                return back()->withErrors(['email' => 'Este correo ya está registrado en UPEMarket.'])->withInput();
+            }
+
             $usuario = new User();
             $usuario->nombre = $request->nombre;
             $usuario->email = $request->email;
@@ -89,7 +91,7 @@ class AuthController extends Controller
         } catch(ValidationException $e){
             return back()->withErrors($e->errors())->withInput();
         } catch(\Exception $e){
-            return back()->withErrors(['error' => 'Error del servidor: ' . $e->getMessage()])->withInput();
+            return back()->withErrors(['error' => 'Error del servidor al registrar: ' . $e->getMessage()])->withInput();
         }
     }
 }

@@ -1,224 +1,236 @@
-<x-layout title="UPEMARKET | DASHBOARD">
+<x-layout title="UPEMARKET | PUBLICACIONES">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url("{{ asset('img/Patron comercial.png') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 100vh;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            z-index: 2;
-        }
-
-        .logo {
-            height: 30px;
-        }
-
-        /* Capa translúcida para suavizar el fondo */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.75);
-            z-index: 1;
-        }
-
-        /* Barra de navegación superior */
-        .navbar {
+        .marketplace-container {
             position: relative;
             z-index: 2;
-            background-color: #bd6464;
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .navbar .brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .navbar img {
-            height: 40px;
-        }
-
-        .navbar h1 {
-            font-size: 20px;
-            margin: 0;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .btn-logout {
-            background-color: white;
-            color: #bd6464;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-        }
-
-        .btn-logout:hover {
-            background-color: black;
-            color: white;
-        }
-
-        /* Contenedor Principal del Dashboard */
-        .dashboard-container {
-            position: relative;
-            z-index: 2;
-            max-width: 1100px;
-            margin: 40px auto;
+            max-width: 1200px;
+            margin: 30px auto;
             padding: 0 20px;
             width: 100%;
             box-sizing: border-box;
             flex: 1;
         }
 
-        .welcome-card {
-            background: #bd6464;
-            color: white;
-            padding: 30px;
+        /* Barra de Filtros y Búsqueda estilo Marketplace */
+        .filter-bar {
+            background: white;
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .welcome-card h2 {
-            margin-top: 0;
-            font-size: 26px;
+        .filter-form {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        /* Cuadrícula de opciones/módulos */
-        .grid-modules {
+        .filter-bar .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: white;
+        }
+
+        .filter-bar .search-input:focus {
+            border-color: #bd6464;
+        }
+
+        .btn-primary-custom {
+            background-color: #bd6464;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            height: 41px;
+            box-sizing: border-box;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #a55353;
+        }
+
+        .btn-search {
+            background-color: #1f2937;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            height: 41px;
+        }
+
+        .btn-search:hover {
+            background-color: #374151;
+        }
+
+        /* Cuadrícula de Publicaciones estilo Facebook Marketplace */
+        .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 20px;
         }
 
-        .module-card {
+        .product-card {
             background: white;
-            color: #1f2937;
-            padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border-top: 5px solid #bd6464;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
             transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
             text-decoration: none;
-            display: block;
+            color: inherit;
+            border: 1px solid #f3f4f6;
         }
 
-        .module-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.1);
         }
 
-        .module-card h3 {
-            margin-top: 0;
-            color: #bd6464;
-            font-size: 20px;
+        .product-image-container {
+            width: 100%;
+            height: 180px;
+            background-color: #e5e7eb;
+            position: relative;
+            overflow: hidden;
         }
 
-        .module-card p {
-            color: #4b5563;
-            font-size: 14px;
-            margin-bottom: 0;
+        .product-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .badge-admin {
-            background-color: #1f2937;
+        .product-price {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.75);
             color: white;
             padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
+            border-radius: 6px;
             font-weight: bold;
+            font-size: 16px;
+        }
+
+        .product-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-category {
+            font-size: 12px;
+            color: #6b7280;
             text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .product-location {
+            font-size: 13px;
+            color: #4b5563;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            grid-column: 1 / -1;
         }
     </style>
 
-    <!-- Barra Superior -->
-    <header class="navbar">
-        <div class="brand">
-            <img src="{{ asset('img/Logo UPEMarket.png') }}" alt="Logo UPEMarket" class="logo">
-        </div>
-        <div class="user-info">
-            <span class="badge-admin" style="background-color: green;">Estudiante</span>
-            <!-- Formulario de Cerrar Sesión -->
-            <!--
-            </form>-->
-            <nav>☰
-                <ol>
-                    <li><a href="#"></a></li>
-                    <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                        @csrf<button type="submit" class="btn-logout">Cerrar Sesión</button>
-                </ol>
-            </nav>
-        </div>
-    </header>
+    <div class="marketplace-container">
 
-    <!-- Contenido del Dashboard -->
-    <div class="dashboard-container">
+        <!-- Barra de Búsqueda y Filtros Funcional -->
+        <div class="filter-bar">
+            <form action="{{ url('/publicaciones') }}" method="GET" class="filter-form">
 
-        <!-- Tarjeta de Bienvenida con validación de rol -->
-        <div class="welcome-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <div>
-                    <h2>¡Bienvenido <strong>{{ Auth::user()->nombre ?? 'estudiante' }}</h2>
-                    <p style="margin: 0; font-size: 16px; opacity: 0.9;">
-                        Sistema de gestión e intercambio comercial de la comunidad UPEMOR.
-                    <p><strong>Correo:</strong> {{ Auth::user()->email }} <strong>Carrera:</strong> {{ Auth::user()->carrera ?? 'No especificada' }}</p>
-                    </p>
+                <!-- Input de búsqueda por título -->
+                <input type="text" name="buscar" class="search-input" value="{{ request('buscar') }}" placeholder="Buscar productos en UPEMarket...">
+
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <!-- Selector de categorías -->
+                    <select name="categoria_id" class="search-input" style="min-width: 160px;">
+                        <option value="">Todas las categorías</option>
+                        <option value="Tecnología" {{ request('categoria_id') == 'Tecnología' ? 'selected' : '' }}>Tecnología / Electrónica</option>
+                        <option value="Libros" {{ request('categoria_id') == 'Libros' ? 'selected' : '' }}>Libros y Apuntes</option>
+                        <option value="Ropa" {{ request('categoria_id') == 'Ropa' ? 'selected' : '' }}>Ropa y Uniformes</option>
+                        <option value="Servicios" {{ request('categoria_id') == 'Servicios' ? 'selected' : '' }}>Servicios Académicos</option>
+                        <option value="Varios" {{ request('categoria_id') == 'Varios' ? 'selected' : '' }}>Varios</option>
+                    </select>
+
+                    <button type="submit" class="btn-search">🔍 Buscar</button>
                 </div>
-                <div>
-                    @if(Auth::user()->rol === 'admin')
-                        <span class="badge-admin">Administrador</span>
-                    @else
-
-                    @endif
-                </div>
-            </div>
+            </form>
         </div>
 
-        <!-- Secciones y Módulos -->
-        <div class="grid-modules">
+        <!-- Cuadrícula de Artículos -->
+        <div class="products-grid">
 
-            <!-- Módulo Común: Publicaciones -->
-            <a href="{{ url('/publicaciones') }}" class="module-card">
-                <h3>Publicaciones</h3>
-                <p>Explora, crea y administra los productos o servicios ofrecidos dentro de la comunidad estudiantil.</p>
-            </a>
-
-            <!-- Módulo Común: Categorías -->
-            <a href="{{ url('/categorias') }}" class="module-card">
-                <h3>Categorías</h3>
-                <p>Consulta las diferentes categorías disponibles para clasificar y filtrar los artículos en venta.</p>
-            </a>
-
-            <!-- Módulo Exclusivo para Administradores -->
-            @if(Auth::user()->rol === 'admin')
-                <div class="module-card" style="border-top-color: #1f2937;">
-                    <h3 style="color: #1f2937;">⚙️ Gestión de Usuarios</h3>
-                    <p>Panel de control exclusivo para administradores para dar de alta, modificar o desactivar cuentas institucionales.</p>
+            @forelse($publicaciones ?? [] as $pub)
+                <div class="product-card">
+                    <a href="{{ route('publications.show', $pub->_id ?? $pub->id) }}" class="product-card">
+                        <div class="product-image-container">
+                            <img src="{{ $pub->foto ?? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80' }}" alt="Producto">
+                            <span class="product-price">${{ number_format($pub->precio ?? 0, 2) }}</span>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">{{ $pub->categoria_id ?? 'General' }}</span>
+                            <h3 class="product-title">{{ $pub->titulo ?? 'Sin título' }}</h3>
+                            <p class="product-location">📍 Comunidad UPEMOR</p>
+                        </div>
+                    </a>
                 </div>
-            @endif
+            @empty
+                <!-- Estado vacío -->
+                <div class="empty-state">
+                    <h3 style="color: #bd6464; margin-top: 0;">No hay publicaciones disponibles</h3>
+                    <p style="color: #4b5563; margin-bottom: 0;">¡Sé el primero en ofrecer un producto o servicio a la comunidad estudiantil!</p>
+                </div>
+            @endforelse
 
         </div>
     </div>

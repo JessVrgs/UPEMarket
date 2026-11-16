@@ -5,6 +5,8 @@ use App\Models\User;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ConversacionController;
+use App\Http\Controllers\FavoritoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,9 +27,18 @@ Route::middleware('auth')->group(function (){
     Route::put('/publicaciones/{id}', [PublicacionController::class, 'actualizar']);
     Route::delete('/publicaciones/{id}', [PublicacionController::class, 'eliminar']);
 
-    // ********* cerrar sesión ************
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
     // CATEGORÍAS
     Route::get('/categorias', [CategoriaController::class, 'consultar']);
+
+    //Mensajes
+    Route::post('/mensajes', [ConversacionController::class, 'enviarMensaje']); 
+    Route::get('/mis-mensajes', [ConversacionController::class, 'consultarConversaciones']);
+
+    //Favoritos
+    Route::post('/favoritos', [FavoritoController::class, 'agregarFavorito']);
+    Route::get('/mis-favoritos', [FavoritoController::class, 'consultarFavoritos']);
+    Route::delete('/favoritos/{publicacion_id}', [FavoritoController::class, 'eliminarFavorito']);
+    
+    // ********* cerrar sesión ************
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

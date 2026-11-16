@@ -6,9 +6,56 @@ use Illuminate\Http\Request;
 use App\MOdels\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    public function mostrarLogin(){
+        return "Mau, CONECTA AQUÍ LA VISTA AL LOGIN";
+    }
+
+    public function procesarLogin(Request $request){
+        try{
+            $credenciales = $request->validate([
+                'email'     => 'required|email',
+                'password'  => 'required'
+            ]);
+
+            if(Auth::attempt($credenciales)){
+                $request->session()->regenerate();
+
+                return response()->json([
+                    'estado'    => 'Éxito', 
+                    'mensaje'   => 'Bienvenido a UPEMarket, ' .Auth::user()->nombre
+                ]);
+            }
+
+            //contraseña incorrecta
+            return response()->json([
+                'estado'    => 'Error de autenticación',
+                'mensaje'   => 'Usuario y/o contraseña incorrectos.'
+            ], 401);
+        } catch(\Exception $e){
+            return response()->json([
+                'estado'    => 'Error del servidor',
+                'mensaje'   => 'Inicio de sesión fallido',
+                'detalle'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function logout(Request $request){
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response->json([
+            'estado'    => 'Éxito',
+            'mensaje'   => 'Sesión cerrada con éxito'
+        ]);
+    }
+
     public function mostrarRegistro(){
         return "Conexión a la vista";
     }

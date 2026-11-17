@@ -3,21 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Categoria;
+use App\Models\Publicacion;
 
 class CategoriaController extends Controller
 {
-    public function consultar(){
-        try{
-            $categorias = Categoria::orderBy('nombre', 'asc')->get();
+    // El método debe llamarse 'consultar' tal como lo pide la ruta actual
+    public function consultar(Request $request)
+    {
+        $categoriaSeleccionada = $request->get('categoria');
 
-            return view('category.index');
-        } catch(\Exception $e){
-            return response()->json([
-                'estado'    => 'Error',
-                'mensaje'   => 'No se pudieron cargar las categorías',
-                'detalle'   => $e->getMessage()
-            ], 500);
+        if ($categoriaSeleccionada) {
+            $publicaciones = Publicacion::where('categoria_id', $categoriaSeleccionada)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            // Trae todas las publicaciones para mostrarlas en la vista de categorías
+            $publicaciones = Publicacion::orderBy('created_at', 'desc')->get();
         }
+
+        return view('category.index', compact('publicaciones', 'categoriaSeleccionada'));
     }
 }

@@ -202,7 +202,7 @@
             <div class="profile-card">
                 <h3>⚙️ Configuración de Cuenta</h3>
 
-                <a href="{{ url('/publicaciones') }}" class="btn-action">
+                <a href="{{ route('publications.my_posts') }}" class="btn-action">
                     📦 Ver Mis Artículos en el Marketplace
                 </a>
 

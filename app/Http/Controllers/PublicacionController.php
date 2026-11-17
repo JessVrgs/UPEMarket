@@ -113,37 +113,48 @@ class PublicacionController extends Controller
     }
 
     // Cambiar el estatus de una publicación y/o datos
-    public function actualizar(Request $request, $id){
-        try{
-            $publicacion = Publicacion::find($id);
+    public function editarFormulario($id)
+    {
+        $publicacion = \App\Models\Publicacion::find($id);
 
-            if(!$publicacion){
-                return response()->json([
-                    'estado'    => 'Error',
-                    'mensaje'   => 'Publicación no encontrada.'
-                ], 404);
-            }
-
-            if($request->user()->id != $publicacion->usuario_id){
-                return response()->json([
-                    'estado'    => 'Denegado',
-                    'mensaje'   => 'Permiso denegado, esta publicación no te pertenece.'
-                ], 403);
-            }
-
-            $publicacion->estado = $request->estado ?? $publicacion->estado;
-            $publicacion->save();
-
-            return response()->json([
-                'estado'    => 'Éxito',
-                'mensaje'   => 'Publicación actualizada exitosamente.'
-            ]);
-        } catch(\Exception $e){
-            return response()->json([
-                'estado'    => 'Error',
-                'mensaje'   => 'Error al actualizar'
-            ], 500);
+        if (!$publicacion || $publicacion->usuario_id !== auth()->id()) {
+            return redirect('/mis-publicaciones')->with('error', 'No autorizado o publicación no encontrada.');
         }
+
+        return view('publications.edit', compact('publicacion'));
+    }
+
+    public function actualizar(Request $request, $id)
+    {
+        $publicacion = Publicacion::find($id);
+
+        if (!$publicacion || $publicacion->usuario_id !== auth()->id()) {
+            return redirect('/mis-publicaciones')->with('error', 'Acción no autorizada.');
+        }
+
+        $request->validate([
+            'titulo'       => 'required|string|max:100',
+            'precio'       => 'required|numeric|min:0',
+            'descripcion'  => 'required|string',
+            'categoria_id' => 'required|string',
+            'estado'       => 'required|string',
+            'foto'         => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:10240'
+        ]);
+
+        $publicacion->titulo = $request->titulo;
+        $publicacion->precio = $request->precio;
+        $publicacion->descripcion = $request->descripcion;
+        $publicacion->categoria_id = $request->categoria_id;
+        $publicacion->estado = $request->estado;
+
+        if ($request->hasFile('foto')) {
+            $path = $request->file('foto')->store('productos', 'public');
+            $publicacion->foto = asset('storage/' . $path);
+        }
+
+        $publicacion->save();
+
+        return redirect('/mis-publicaciones')->with('success', '¡Artículo actualizado con éxito!');
     }
 
     public function eliminar(Request $request, $id){
@@ -174,4 +185,6 @@ class PublicacionController extends Controller
             ], 500);
         }
     }
+
+
 }

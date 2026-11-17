@@ -263,8 +263,11 @@
 
         <li style="margin-top: 5px;"><a href="{{ url('/categorias') }}">🏷️ Categorías</a></li>
 
+        <!-- Botón de Chats / Mensajes Directos -->
+        <li style="margin-top: 5px;"><a href="{{ route('mensajes.index') }}">💬 Mensajes</a></li>
+
         @if(Auth::user()?->rol === 'admin')
-            <li style="margin-top: 5px;"><a href="#">⚙️ Gestión de Usuarios</a></li>
+            <li style="margin-top: 5px;"><a href="{{ route('users.management') }}">⚙️ Gestión de Usuarios</a></li>
         @endif
 
         <li style="margin-top: auto; border-top: 1px solid #f3f4f6; padding-top: 15px;">

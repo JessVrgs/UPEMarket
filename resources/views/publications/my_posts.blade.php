@@ -50,6 +50,7 @@
             align-items: center;
             gap: 8px;
             transition: background 0.2s;
+            font-size: 14px;
         }
 
         .btn-primary-custom:hover {
@@ -103,7 +104,7 @@
             padding: 4px 10px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .product-status {
@@ -117,6 +118,7 @@
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .product-status.paused {
@@ -124,7 +126,7 @@
         }
 
         .product-info {
-            padding: 15px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -132,10 +134,11 @@
         }
 
         .product-category {
-            font-size: 12px;
+            font-size: 11px;
             color: #6b7280;
             text-transform: uppercase;
-            font-weight: bold;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .product-title {
@@ -148,19 +151,26 @@
             text-overflow: ellipsis;
         }
 
+        .product-date {
+            font-size: 12px;
+            color: #9ca3af;
+            margin: 0;
+        }
+
+        /* Botones de acción limpios y organizados */
         .product-actions {
-            padding: 12px 15px;
+            padding: 12px 16px;
             background-color: #f9fafb;
             border-top: 1px solid #f3f4f6;
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-action-card {
             flex: 1;
-            padding: 8px;
+            padding: 8px 6px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-align: center;
             text-decoration: none;
@@ -207,12 +217,11 @@
                 <p>Administra, edita o elimina los artículos que has ofrecido en la comunidad UPEMOR</p>
             </div>
             <a href="{{ route('publications.create') }}" class="btn-primary-custom">
-                <span>➕</span> Publicar Nuevo Artículo
+                + Publicar Artículo
             </a>
         </div>
 
         @php
-            // Filtramos las publicaciones obtenidas en el controlador pertenecientes únicamente al usuario logueado
             $misPublicaciones = \App\Models\Publicacion::where('usuario_id', Auth::id())
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -233,20 +242,23 @@
                     <div class="product-info">
                         <span class="product-category">{{ $pub->categoria_id ?? 'General' }}</span>
                         <h3 class="product-title">{{ $pub->titulo ?? 'Sin título' }}</h3>
-                        <p style="font-size: 12px; color: #6b7280; margin: 0;">Publicado el {{ $pub->created_at?->format('d/m/Y') ?? 'Reciente' }}</p>
+                        <p class="product-date">Publicado el {{ $pub->created_at?->format('d/m/Y') ?? 'Reciente' }}</p>
                     </div>
 
-                    <!-- Botones de Gestión -->
+                    <!-- Botones de Gestión Limpios -->
                     <div class="product-actions">
                         <a href="{{ route('publications.show', $pub->_id ?? $pub->id) }}" class="btn-action-card">
-                            👁️ Ver
+                            Ver
+                        </a>
+                        <a href="{{ route('publications.edit', $pub->_id ?? $pub->id) }}" class="btn-action-card">
+                            Editar
                         </a>
 
                         <form action="{{ url('/publicaciones/' . ($pub->_id ?? $pub->id)) }}" method="POST" style="flex: 1; margin: 0;" onsubmit="return confirm('¿Estás seguro de eliminar esta publicación?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn-action-card btn-delete" style="width: 100%;">
-                                🗑️ Eliminar
+                                Eliminar
                             </button>
                         </form>
                     </div>

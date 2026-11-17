@@ -119,21 +119,22 @@
         @endif
 
         <div class="messages-list-card">
-            @forelse($mensajes ?? [] as $msg)
+            @forelse($conversaciones ?? [] as $conv)
                 @php
-                    $esEmisor = (string) $msg->emisor_id === (string) auth()->id();
-                    $otroUsuarioId = $esEmisor ? $msg->receptor_id : $msg->emisor_id;
-                    $otroUsuario = \App\Models\User::find($otroUsuarioId);
-                    $articulo = \App\Models\Publicacion::find($msg->publicacion_id);
+                    $miId = (string) auth()->id();
+                    $otroUsuario = ((string) $conv->comprador_id === $miId) ? $conv->vendedor : $conv->comprador;
+                    $articulo = $conv->publicacion;
+                    $listaMensajes = $conv->mensajes ?? [];
+                    $ultimoMsg = !empty($listaMensajes) ? end($listaMensajes) : null;
+                    $esEmisor = $ultimoMsg && ((string) ($ultimoMsg['emisor_id'] ?? '') === $miId);
                 @endphp
 
-                    <!-- Tarjeta completa como enlace estilo WhatsApp -->
-                <a href="{{ route('mensajes.chat', $msg->_id ?? $msg->id) }}" class="message-card-link">
+                <a href="{{ route('mensajes.chat', $conv->_id ?? $conv->id) }}" class="message-card-link">
                     <div class="message-item">
                         <div class="message-header-info">
                             <div>
                                 <span class="message-user">
-                                    {{ $esEmisor ? 'Para: ' . ($otroUsuario?->nombre ?? $otroUsuario?->name ?? 'Usuario') : 'De: ' . ($otroUsuario?->nombre ?? $otroUsuario?->name ?? 'Usuario') }}
+                                    {{ $esEmisor ? 'Para: ' : 'De: ' }}{{ $otroUsuario?->nombre ?? $otroUsuario?->name ?? 'Usuario' }}
                                 </span>
                                 @if($articulo)
                                     <span style="margin-left: 10px; font-size: 13px; color: #bd6464; font-weight: 600;">
@@ -141,11 +142,11 @@
                                     </span>
                                 @endif
                             </div>
-                            <span style="font-size: 12px;">{{ $msg->created_at?->format('d/m/Y H:i') ?? 'Reciente' }}</span>
+                            <span style="font-size: 12px;">{{ $ultimoMsg['fecha'] ?? $conv->updated_at?->format('d/m/Y H:i') ?? 'Reciente' }}</span>
                         </div>
 
                         <p class="message-body {{ $esEmisor ? 'sent' : '' }}">
-                            {{ $msg->mensaje }}
+                            {{ $ultimoMsg['texto'] ?? 'Sin mensajes' }}
                         </p>
                     </div>
                 </a>

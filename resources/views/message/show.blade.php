@@ -130,11 +130,14 @@
         <div class="chat-body-card">
             @forelse($mensajesChat ?? [] as $msg)
                 @php
-                    $esMio = (string) $msg->emisor_id === (string) auth()->id();
+                    $emisorId = is_array($msg) ? ($msg['emisor_id'] ?? '') : ($msg->emisor_id ?? '');
+                    $textoMsg = is_array($msg) ? ($msg['texto'] ?? '') : ($msg->texto ?? $msg->mensaje ?? '');
+                    $fechaMsg = is_array($msg) ? ($msg['fecha'] ?? '') : ($msg->fecha ?? '');
+                    $esMio = (string) $emisorId === (string) auth()->id();
                 @endphp
                 <div class="bubble {{ $esMio ? 'outgoing' : 'incoming' }}">
-                    {{ $msg->mensaje }}
-                    <div class="bubble-time">{{ $msg->created_at?->format('H:i') }}</div>
+                    {{ $textoMsg }}
+                    <div class="bubble-time">{{ $fechaMsg }}</div>
                 </div>
             @empty
                 <div style="text-align: center; color: #6b7280; margin: auto;">
@@ -146,7 +149,7 @@
         <!-- Formulario para responder en el chat -->
         <form action="{{ route('mensajes.enviar') }}" method="POST" class="chat-footer-form">
             @csrf
-            <input type="hidden" name="receptor_id" value="{{ $otroUsuario?->_id ?? $otroUsuario?->id }}">
+            <input type="hidden" name="conversacion_id" value="{{ $conversacion->_id ?? $conversacion->id }}">
             <input type="hidden" name="publicacion_id" value="{{ $articulo?->_id ?? $articulo?->id }}">
             <textarea name="mensaje" placeholder="Escribe un mensaje..." required></textarea>
             <button type="submit" class="btn-send">Enviar</button>

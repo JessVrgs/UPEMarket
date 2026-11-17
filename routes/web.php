@@ -1,53 +1,56 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PublicacionController;
-use App\Http\Controllers\CategoriaController;
+    use Illuminate\Support\Facades\Route;
+    use App\Http\Controllers\AuthController;
+    use App\Http\Controllers\PublicacionController;
+    use App\Http\Controllers\CategoriaController;
+    use App\Http\Controllers\ConversacionController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+    Route::get('/', function () {
+        return view('welcome');
+    });
 
-// ====================== AUTENTICACIÓN ========================
-Route::get('/login', [AuthController::class, 'mostrarLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'procesarLogin']);
+    // ====================== AUTENTICACIÓN ========================
+    Route::get('/login', [AuthController::class, 'mostrarLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'procesarLogin']);
 
-// ================= REGISTRO DE USUARIOS ===================
-Route::get('/registro', [AuthController::class, 'mostrarRegistro']);
-Route::post('/registro', [AuthController::class, 'procesarRegistro']);
+    // ================= REGISTRO DE USUARIOS ===================
+    Route::get('/registro', [AuthController::class, 'mostrarRegistro']);
+    Route::post('/registro', [AuthController::class, 'procesarRegistro']);
 
-// ================= RUTAS PROTEGIDAS ===================
-Route::middleware('auth')->group(function (){
+    // ================= RUTAS PROTEGIDAS ===================
+    Route::middleware('auth')->group(function () {
 
-    // Ver detalle de una publicación
-    Route::get('/publicaciones/{id}', [PublicacionController::class, 'mostrar'])->name('publications.show');
-// Ver detalle de una publicación
-    Route::get('/publicaciones/{id}', [PublicacionController::class, 'mostrar'])->name('publications.show');
-    // PUBLICACIONES (CRUD)
-    Route::get('/publicaciones', [PublicacionController::class, 'consultar']);
+        // PUBLICACIONES (CRUD)
+        Route::get('/publicaciones', [PublicacionController::class, 'consultar'])->name('publications.index');
 
-    // Ruta para mostrar el formulario de crear publicación
-    Route::get('/publicaciones/crear', function () {
-        return view('publications.create'); // Ajusta la vista si usas un controlador
-    })->name('publications.create');
+        // Importante: '/publicaciones/crear' debe ir ANTES de '/publicaciones/{id}'
+        Route::get('/publicaciones/crear', function () {
+            return view('publications.create');
+        })->name('publications.create');
 
-    Route::post('/publicaciones', [PublicacionController::class, 'crear']);
-    Route::put('/publicaciones/{id}', [PublicacionController::class, 'actualizar']);
-    Route::delete('/publicaciones/{id}', [PublicacionController::class, 'eliminar']);
+        Route::get('/publicaciones/{id}', [PublicacionController::class, 'mostrar'])->name('publications.show');
+        Route::post('/publicaciones', [PublicacionController::class, 'crear']);
+        Route::put('/publicaciones/{id}', [PublicacionController::class, 'actualizar']);
+        Route::delete('/publicaciones/{id}', [PublicacionController::class, 'eliminar']);
 
-    // PERFIL DE USUARIO
-    Route::get('/perfil', function () {
-        return view('profile.index');
-    })->name('profile.index');
+        // CONVERSACIONES / MENSAJES (Usando ConversacionController con las vistas de tu compañero)
+        Route::get('/mensajes', [ConversacionController::class, 'consultarConversacion'])->name('mensajes.index');
+        Route::get('/mensajes/{id}', [ConversacionController::class, 'verChat'])->name('mensajes.chat');
+        Route::post('/mensajes', [ConversacionController::class, 'enviarMensajes'])->name('mensajes.enviar');
 
-    Route::get('/publications', function () {
-        return view('publications.my_posts');
-    })->name('publications.my_posts');
+        // PERFIL DE USUARIO
+        Route::get('/perfil', function () {
+            return view('profile.index');
+        })->name('profile.index');
 
-    // CATEGORÍAS
-    Route::get('/categorias', [CategoriaController::class, 'consultar']);
+        Route::get('/publications', function () {
+            return view('publications.my_posts');
+        })->name('publications.my_posts');
 
-    // CERRAR SESIÓN
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-});
+        // CATEGORÍAS
+        Route::get('/categorias', [CategoriaController::class, 'consultar']);
+
+        // CERRAR SESIÓN
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    });

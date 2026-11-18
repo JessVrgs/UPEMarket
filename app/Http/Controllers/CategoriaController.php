@@ -7,7 +7,6 @@ use App\Models\Publicacion;
 
 class CategoriaController extends Controller
 {
-    // El método debe llamarse 'consultar' tal como lo pide la ruta actual
     public function consultar(Request $request)
     {
         $categoriaSeleccionada = $request->get('categoria');
@@ -17,7 +16,6 @@ class CategoriaController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
-            // Trae todas las publicaciones para mostrarlas en la vista de categorías
             $publicaciones = Publicacion::orderBy('created_at', 'desc')->get();
         }
 

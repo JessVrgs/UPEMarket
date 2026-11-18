@@ -76,16 +76,14 @@ class ConversacionController extends Controller
                 'fecha'     => now()->format('d/m/Y H:i')
             ];
 
-            // Caso A: Viene desde dentro del chat privado (ya existe conversacion_id)
             if ($request->filled('conversacion_id')) {
                 $conversacion = Conversacion::findOrFail($request->conversacion_id);
                 $conversacion->push('mensajes', $nuevoMensaje);
-                $conversacion->touch(); // Actualiza updated_at
+                $conversacion->touch(); 
 
                 return redirect()->route('mensajes.chat', $conversacion->_id ?? $conversacion->id);
             }
 
-            // Caso B: Viene desde la página del producto (el comprador inicia o retoma charla)
             if ($mi_id === (string) $publicacion->usuario_id) {
                 return back()->with('error', 'No puedes enviarte un mensaje a ti mismo.');
             }

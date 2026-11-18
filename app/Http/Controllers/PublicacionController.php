@@ -14,17 +14,14 @@ class PublicacionController extends Controller
         try {
             $query = Publicacion::where('oculta', false);
 
-            // Búsqueda por título
             if ($request->filled('buscar')) {
                 $query->where('titulo', 'like', '%' . $request->buscar . '%');
             }
 
-            // Búsqueda por categoría
             if ($request->filled('categoria_id')) {
                 $query->where('categoria_id', $request->categoria_id);
             }
 
-            // Filtrar por precio mínimo y máximo
             if ($request->filled('precio_min')) {
                 $query->where('precio', '>=', (float) $request->precio_min);
             }
@@ -32,17 +29,14 @@ class PublicacionController extends Controller
                 $query->where('precio', '<=', (float) $request->precio_max);
             }
 
-            // Ordenar por precio o fecha
             if ($request->filled('orden_precio') && in_array($request->orden_precio, ['asc', 'desc'])) {
                 $query->orderBy('precio', $request->orden_precio);
             } else {
                 $query->orderBy('created_at', 'desc');
             }
 
-            // Consulta final en MongoDB Atlas
             $publicaciones = $query->get();
 
-            // Pasamos la variable $publicaciones a la vista para que el @forelse funcione
             return view('publications.index', compact('publicaciones'));
 
         } catch (\Exception $e) {
@@ -53,16 +47,26 @@ class PublicacionController extends Controller
     public function crear(Request $request)
     {
         try {
-            // Validaciones
-            $request->validate([
-                'titulo'       => 'required|string|max:100',
+            // 1. Definimos las reglas
+            $reglas = [
+                // \pL asegura que exista al menos una letra unicode (permite números y espacios mientras haya letras)
+                'titulo'       => ['required', 'string', 'max:100', 'regex:/[\pL]/u'], 
                 'precio'       => 'required|numeric|min:0',
                 'descripcion'  => 'required|string',
                 'categoria_id' => 'required|string',
-                'foto'         => 'required|file|image|mimes:jpeg,png,jpg,webp|max:10240' // Subido a 10MB y flexible
-            ]);
+                'foto'         => 'required|file|image|mimes:jpeg,png,jpg,webp|max:10240' 
+            ];
 
-            // Procesar fotografía en Cloudinary
+            // 2. Definimos los mensajes de error personalizados
+            $mensajes = [
+                'titulo.regex' => 'El título no puede contener solo números, debe incluir letras.',
+                'foto.image'   => 'Solo se aceptan imágenes y el archivo que quiere subir no es válido.',
+                'foto.mimes'   => 'Solo se aceptan imágenes y el archivo que quiere subir no es válido.',
+            ];
+
+            // Pasamos ambos arreglos a la validación
+            $request->validate($reglas, $mensajes);
+
             $rutaFoto = null;
             $fotoPublicId = null;
             if ($request->hasFile('foto')) {
@@ -71,25 +75,18 @@ class PublicacionController extends Controller
                 $fotoPublicId = $subida['public_id'];
             }
 
-            // Creación del registro
             $publicacion = new Publicacion();
             $publicacion->titulo = $request->titulo;
             $publicacion->precio = $request->precio;
             $publicacion->descripcion = $request->descripcion;
             $publicacion->categoria_id = $request->categoria_id;
-
-            // Usamos 'foto' en singular y guardamos el ID de Cloudinary
             $publicacion->foto = $rutaFoto;
             $publicacion->foto_public_id = $fotoPublicId;
-
-            // Asignación del usuario desde su sesión activa
             $publicacion->usuario_id = auth()->id();
-
             $publicacion->estado = 'disponible';
             $publicacion->oculta = false;
             $publicacion->save();
 
-            // Redirección exitosa de vuelta a la lista de publicaciones
             return redirect('/publicaciones')->with('success', '¡Artículo publicado con éxito!');
 
         } catch (ValidationException $e) {
@@ -116,13 +113,11 @@ class PublicacionController extends Controller
         }
     }
 
-    // Mostrar el formulario para editar una publicación existente
     public function editar($id)
     {
         try {
             $publicacion = Publicacion::findOrFail($id);
 
-            // Verificar que solo el dueño o un admin pueda entrar a editar
             $esDueno = (string) $publicacion->usuario_id === (string) auth()->id();
             $esAdmin = auth()->user()?->rol === 'admin';
 
@@ -147,14 +142,23 @@ class PublicacionController extends Controller
             return redirect()->route('publications.my_posts')->with('error', 'Acción no autorizada.');
         }
 
-        $request->validate([
-            'titulo'       => 'required|string|max:100',
+        // Aplicamos las mismas reglas y mensajes en la edición para mantener consistencia
+        $reglas = [
+            'titulo'       => ['required', 'string', 'max:100', 'regex:/[\pL]/u'],
             'precio'       => 'required|numeric|min:0',
             'descripcion'  => 'required|string',
             'categoria_id' => 'required|string',
             'estado'       => 'required|string',
             'foto'         => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:10240'
-        ]);
+        ];
+
+        $mensajes = [
+            'titulo.regex' => 'El título no puede contener solo números, debe incluir letras.',
+            'foto.image'   => 'Solo se aceptan imágenes y el archivo que quiere subir no es válido.',
+            'foto.mimes'   => 'Solo se aceptan imágenes y el archivo que quiere subir no es válido.',
+        ];
+
+        $request->validate($reglas, $mensajes);
 
         $publicacion->titulo = $request->titulo;
         $publicacion->precio = $request->precio;

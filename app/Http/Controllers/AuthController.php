@@ -36,7 +36,7 @@ class AuthController extends Controller
                 return redirect()->intended('/publicaciones');
             } else {
                 // Si entra aquí, la contraseña ingresada no coincide con el hash guardado
-                return back()->withErrors(['email' => 'La contraseña no coincide con el registro (Hash inválido o texto plano).']);
+                return back()->withErrors(['email' => 'La contraseña no coincide con el registro .']);
             }
 
         } catch(\Exception $e){
@@ -70,7 +70,7 @@ class AuthController extends Controller
             // Validación adicional por si el correo ya está registrado en MongoDB
             $existe = User::where('email', $request->email)->first();
             if ($existe) {
-                return back()->withErrors(['email' => 'Este correo ya está registrado en UPEMarket.'])->withInput();
+                return back()->withErrors(['email' => 'Este correo ya se ha registrado.'])->withInput();
             }
 
             $usuario = new User();

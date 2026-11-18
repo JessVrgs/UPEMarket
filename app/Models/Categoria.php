@@ -8,6 +8,7 @@ class Categoria extends Model
 {
     protected $connection = 'mongodb';
     protected $collection = 'categorias';
+    protected $table = 'categorias';
 
     protected $fillable = [
         'nombre',

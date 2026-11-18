@@ -8,6 +8,7 @@ class Reporte extends Model
 {
     protected $connection = 'mongodb';
     protected $collection = 'reportes';
+    protected $table = 'reportes';
 
     protected $fillable = [
         'publicacion_id',

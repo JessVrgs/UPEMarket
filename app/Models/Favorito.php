@@ -8,6 +8,7 @@ class Favorito extends Model
 {
     protected $connection = 'mongodb';
     protected $collection = 'favoritos';
+    protected $table = 'favoritos';
 
     protected $fillable = [
         'usuario_id',

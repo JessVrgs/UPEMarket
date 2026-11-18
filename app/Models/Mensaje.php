@@ -8,6 +8,7 @@ class Mensaje extends Model
 {
     protected $connection = 'mongodb';
     protected $collection = 'mensajes';
+    protected $table = 'mensajes';
 
     protected $fillable = [
         'emisor_id',

@@ -8,6 +8,7 @@ class Publicacion extends Model
 {
     protected $connection = 'mongodb';
     protected $collection = 'publicaciones';
+    protected $table = 'publicaciones';
 
     protected $fillable = [
         'usuario_id',

@@ -8,6 +8,7 @@ class Conversacion extends Model
 {
     protected $connection = 'mongodb';
     protected $collection = 'conversaciones';
+    protected $table = 'conversaciones';
 
     protected $fillable = [
         'publicacion_id',

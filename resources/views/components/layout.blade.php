@@ -12,7 +12,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f3f4f6;
             height: 100vh;
-            overflow: hidden; /* Evita scroll en todo el body, lo delegamos al contenido */
+            overflow: hidden; 
             display: flex;
         }
 
@@ -28,7 +28,7 @@
             z-index: 100;
         }
 
-        /* Clase para ocultar el menú empujándolo hacia la izquierda */
+        /* Oculta el menú empujándolo fuera de la pantalla */
         .sidebar.collapsed {
             margin-left: -260px;
         }
@@ -170,10 +170,10 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            min-width: 0; /* Previene desbordamientos en flexbox */
+            min-width: 0;
+            transition: margin-left 0.3s ease; /* Transición suave al colapsar el menú */
         }
 
-        /* Fondo translúcido aplicado solo al área de contenido, no al menú */
         .main-wrapper::before {
             content: "";
             position: absolute;
@@ -184,7 +184,7 @@
             background-image: url("{{ asset('img/Patron comercial.png') }}");
             background-size: cover;
             background-position: center;
-            opacity: 0.25; /* Ajusta la opacidad del patrón aquí */
+            opacity: 0.25;
             z-index: -1;
         }
 
@@ -229,13 +229,39 @@
         .content-area {
             flex-grow: 1;
             padding: 30px;
-            overflow-y: auto; /* El scroll ocurre solo aquí, no en toda la página */
+            overflow-y: auto;
+        }
+
+        /* ========================================================
+           MEDIA QUERIES PARA RESPONSIVIDAD (MÓVILES)
+           ======================================================== */
+        @media (max-width: 768px) {
+            /* En pantallas pequeñas, el menú inicia oculto por defecto */
+            .sidebar {
+                margin-left: -260px; /* Oculto inicialmente */
+                position: absolute;  /* Flota sobre el contenido en lugar de empujarlo */
+                height: 100%;
+            }
+
+            /* Si en móvil se abre el menú, se muestra por encima */
+            .sidebar.mobile-open {
+                margin-left: 0;
+            }
+
+            /* Ajustes visuales para pantallas pequeñas */
+            .topbar {
+                padding: 10px 15px;
+            }
+            .content-area {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
 
     <!-- MENÚ LATERAL -->
+    <!-- En PC arranca normal, en móviles arranca oculto por el CSS @media -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="{{ asset('img/Logo Completo UPEMarket.png') }}" alt="Logo" style="height: 25px;">
@@ -254,20 +280,18 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="{{ url('/publicaciones') }}">🏠 Inicio</a>
+            <a href="{{ url('/') }}">🏠 Inicio</a>
             
-            <!-- Grupo Publicaciones desglosado -->
             <a href="{{ url('/publicaciones') }}" style="margin-top: 5px;">📦 Publicaciones</a>
             <a href="{{ route('publications.my_posts') }}" class="submenu-item">Mis productos</a>
             
-            {{-- <a href="{{ url('/categorias') }}" style="margin-top: 5px;">🏷️ Categorías</a> --}}
+            <a href="{{ url('/categorias') }}" style="margin-top: 5px;">🏷️ Categorías</a>
             <a href="{{ route('mensajes.index') }}" style="margin-top: 5px;">💬 Mensajes</a>
 
             @if(Auth::user()?->rol === 'admin')
                 <a href="{{ route('users.management') }}" style="margin-top: 5px;">⚙️ Gestión Usuarios</a>
             @endif
 
-            <!-- Botón destacado en el menú -->
             <a href="{{ url('/publicaciones/crear') }}" class="btn-create">+ Crear Publicación</a>
         </nav>
 
@@ -280,11 +304,11 @@
     </aside>
 
     <!-- CONTENEDOR DERECHO (TopBar + Contenido) -->
-    <div class="main-wrapper">
+    <div class="main-wrapper" id="mainWrapper">
         
         <header class="topbar">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <!-- Botón Hamburguesa que colapsa el menú -->
+                <!-- Botón Hamburguesa -->
                 <button class="hamburger-btn" onclick="toggleSidebar()" title="Ocultar/Mostrar menú">☰</button>
                 <span style="color: #6b7280; font-weight: 500; font-size: 14px;">Panel de control</span>
             </div>
@@ -298,20 +322,35 @@
             </div>
         </header>
 
-        <!-- Aquí se inyectan las vistas de tu compañero -->
         <main class="content-area">
             {{ $slot }}
         </main>
 
     </div>
 
-    <!-- SCRIPT PARA COLAPSAR EL MENÚ -->
+    <!-- SCRIPT PARA COLAPSAR EL MENÚ DE FORMA INTELIGENTE -->
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            // La clase collapsed empuja el menú a margin-left: -260px, y el contenido principal toma ese espacio fluidamente
-            sidebar.classList.toggle('collapsed');
+            
+            // Verificamos si estamos en una pantalla de celular (menor a 768px)
+            if (window.innerWidth <= 768) {
+                // En móviles, alternamos la clase 'mobile-open'
+                sidebar.classList.toggle('mobile-open');
+            } else {
+                // En PC o pantallas grandes, alternamos la clase 'collapsed'
+                sidebar.classList.toggle('collapsed');
+            }
         }
+
+        // Cierra el menú en móvil si se hace clic fuera del sidebar
+        document.getElementById('mainWrapper').addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-open')) {
+                // Oculta el menú si se hace clic en el área principal
+                sidebar.classList.remove('mobile-open');
+            }
+        });
     </script>
 </body>
 </html>

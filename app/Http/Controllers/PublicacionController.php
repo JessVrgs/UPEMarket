@@ -5,15 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Publicacion;
 use Illuminate\Validation\ValidationException;
+use App\Services\CloudinaryService;
 
 class PublicacionController extends Controller
 {
-    public function consultar(Request $request){
-        try{
+    public function consultar(Request $request)
+    {
+        try {
             $query = Publicacion::where('oculta', false);
 
             // Búsqueda por título
-            if($request->filled('buscar')){
+            if ($request->filled('buscar')) {
                 $query->where('titulo', 'like', '%' . $request->buscar . '%');
             }
 
@@ -43,29 +45,30 @@ class PublicacionController extends Controller
             // Pasamos la variable $publicaciones a la vista para que el @forelse funcione
             return view('publications.index', compact('publicaciones'));
 
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             return view('publications.index', ['publicaciones' => collect()])->with('error', 'Error al cargar las publicaciones.');
         }
     }
 
-    public function crear(Request $request){
-        try{
+    public function crear(Request $request)
+    {
+        try {
             // Validaciones
             $request->validate([
-                'titulo'        => 'required|string|max:100',
-                'precio'        => 'required|numeric|min:0',
-                'descripcion'   => 'required|string',
-                'categoria_id'  => 'required|string',
-                'foto'          => 'required|file|image|mimes:jpeg,png,jpg,webp|max:10240' // Subido a 10MB y flexible
+                'titulo'       => 'required|string|max:100',
+                'precio'       => 'required|numeric|min:0',
+                'descripcion'  => 'required|string',
+                'categoria_id' => 'required|string',
+                'foto'         => 'required|file|image|mimes:jpeg,png,jpg,webp|max:10240' // Subido a 10MB y flexible
             ]);
 
-            // Procesar fotografía
+            // Procesar fotografía en Cloudinary
             $rutaFoto = null;
-            if($request->hasFile('foto')){
-                // La foto se guarda en storage/app/public/productos
-                $path = $request->file('foto')->store('productos', 'public');
-                // Guardamos la ruta pública accesible (storage/productos/...)
-                $rutaFoto = asset('storage/' . $path);
+            $fotoPublicId = null;
+            if ($request->hasFile('foto')) {
+                $subida = app(CloudinaryService::class)->subir($request->file('foto'));
+                $rutaFoto = $subida['url'];
+                $fotoPublicId = $subida['public_id'];
             }
 
             // Creación del registro
@@ -75,8 +78,9 @@ class PublicacionController extends Controller
             $publicacion->descripcion = $request->descripcion;
             $publicacion->categoria_id = $request->categoria_id;
 
-            // Usamos 'foto' en singular para que coincida perfectamente
+            // Usamos 'foto' en singular y guardamos el ID de Cloudinary
             $publicacion->foto = $rutaFoto;
+            $publicacion->foto_public_id = $fotoPublicId;
 
             // Asignación del usuario desde su sesión activa
             $publicacion->usuario_id = auth()->id();
@@ -88,7 +92,7 @@ class PublicacionController extends Controller
             // Redirección exitosa de vuelta a la lista de publicaciones
             return redirect('/publicaciones')->with('success', '¡Artículo publicado con éxito!');
 
-        } catch(ValidationException $e){
+        } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
 
         } catch (\Exception $e) {
@@ -112,7 +116,6 @@ class PublicacionController extends Controller
         }
     }
 
-    // Cambiar el estatus de una publicación y/o datos
     // Mostrar el formulario para editar una publicación existente
     public function editar($id)
     {
@@ -160,42 +163,53 @@ class PublicacionController extends Controller
         $publicacion->estado = $request->estado;
 
         if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('productos', 'public');
-            $publicacion->foto = asset('storage/' . $path);
+            $fotoAnterior = $publicacion->foto_public_id;
+            $subida = app(CloudinaryService::class)->subir($request->file('foto'));
+            $publicacion->foto = $subida['url'];
+            $publicacion->foto_public_id = $subida['public_id'];
+
+            if ($fotoAnterior) {
+                app(CloudinaryService::class)->borrar($fotoAnterior);
+            }
         }
 
         $publicacion->save();
         return redirect()->route('publications.my_posts')->with('success', '¡Artículo actualizado con éxito!');
     }
 
-    public function eliminar(Request $request, $id){
-        try{
+    public function eliminar(Request $request, $id)
+    {
+        try {
             $publicacion = Publicacion::find($id);
 
-            if(!$publicacion){
+            if (!$publicacion) {
                 return response()->json([
-                    'estado'    => 'Error',
-                    'mensaje'   => 'El producto no existe.'
+                    'estado'  => 'Error',
+                    'mensaje' => 'El producto no existe.'
                 ], 404);
             }
 
-            if($request->user()->id != $publicacion->usuario_id){
+            if ($request->user()->id != $publicacion->usuario_id) {
                 return response()->json([
-                    'estado'    => 'Denegado',
-                    'mensaje'   => 'Solo el propietario puede eliminar su propia publicación.'
+                    'estado'  => 'Denegado',
+                    'mensaje' => 'Solo el propietario puede eliminar su propia publicación.'
                 ], 403);
             }
 
+            $fotoPublicId = $publicacion->foto_public_id;
             $publicacion->delete();
+
+            if ($fotoPublicId) {
+                app(CloudinaryService::class)->borrar($fotoPublicId);
+            }
+
             return view('publications.my_posts');
 
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
-                'estado'    => 'Error',
-                'mensaje'   => 'Error al intentar eliminar la publicación'
+                'estado'  => 'Error',
+                'mensaje' => 'Error al intentar eliminar la publicación'
             ], 500);
         }
     }
-
-
 }

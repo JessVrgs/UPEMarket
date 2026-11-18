@@ -258,8 +258,8 @@
                     </div>
 
                     <div class="section-box">
-                        <h4>Lugar de Entrega</h4>
-                        <p>📍 Instalaciones de la Universidad Politécnica del Estado de Morelos (UPEMOR)</p>
+                        <h4>Fecha de Publicación</h4>
+                        <p>📅 {{ $publicacion->created_at ? $publicacion->created_at->setTimezone('America/Mexico_City')->locale('es')->isoFormat('D [de] MMMM [de] YYYY, h:mm A') : 'Fecha no disponible' }}</p>
                     </div>
 
                     @php

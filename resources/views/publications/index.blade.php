@@ -180,6 +180,37 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             grid-column: 1 / -1;
         }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-wrapper .search-input {
+            width: 100%;
+            padding-right: 36px; /* Espacio para que el texto no choque con la X */
+        }
+
+        .clear-input-btn {
+            position: absolute;
+            right: 10px;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1;
+            padding: 4px;
+            border-radius: 50%;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .clear-input-btn:hover {
+            color: #1f2937;
+            background-color: #f3f4f6;
+        }
     </style>
 
     <div class="marketplace-container">
@@ -188,9 +219,13 @@
         <div class="filter-bar">
             <form action="{{ url('/publicaciones') }}" method="GET" class="filter-form">
 
-                <!-- Input de búsqueda por título -->
-                <input type="text" name="buscar" class="search-input" value="{{ request('buscar') }}" placeholder="Buscar productos en UPEMarket...">
-
+                <!-- Input de búsqueda por título con X interna -->
+                <div class="search-wrapper">
+                    <input type="text" name="buscar" class="search-input" value="{{ request('buscar') }}" placeholder="Buscar productos en UPEMarket...">
+                    @if(request()->filled('buscar'))
+                        <a href="{{ url('/publicaciones') . (request()->filled('categoria_id') ? '?categoria_id=' . urlencode(request('categoria_id')) : '') }}" class="clear-input-btn" title="Limpiar búsqueda">&times;</a>
+                    @endif
+                </div>
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <!-- Selector de categorías -->
                     <select name="categoria_id" class="search-input" style="min-width: 160px;">
@@ -227,8 +262,14 @@
             @empty
                 <!-- Estado vacío -->
                 <div class="empty-state">
-                    <h3 style="color: #bd6464; margin-top: 0;">No hay publicaciones disponibles</h3>
-                    <p style="color: #4b5563; margin-bottom: 0;">¡Sé el primero en ofrecer un producto o servicio a la comunidad estudiantil!</p>
+                    @if(request()->filled('buscar') || request()->filled('categoria_id'))
+                        <h3 style="color: #bd6464; margin-top: 0;">No se encontraron resultados</h3>
+                        <p style="color: #4b5563; margin-bottom: 15px;">Intenta con otra palabra clave o limpia los filtros para ver todo el catálogo.</p>
+                        <a href="{{ url('/publicaciones') }}" class="btn-primary-custom">Ver todas las publicaciones</a>
+                    @else
+                        <h3 style="color: #bd6464; margin-top: 0;">No hay publicaciones disponibles</h3>
+                        <p style="color: #4b5563; margin-bottom: 0;">¡Sé el primero en ofrecer un producto o servicio a la comunidad estudiantil!</p>
+                    @endif
                 </div>
             @endforelse
 

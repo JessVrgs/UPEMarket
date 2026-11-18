@@ -10,173 +10,107 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url("{{ asset('img/Patron comercial.png') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 100vh;
-            position: relative;
+            background-color: #f3f4f6;
+            height: 100vh;
+            overflow: hidden; /* Evita scroll en todo el body, lo delegamos al contenido */
+            display: flex;
+        }
+
+        /* --- MENÚ LATERAL (SIDEBAR) --- */
+        .sidebar {
+            width: 260px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
+            transition: margin-left 0.3s ease;
+            flex-shrink: 0;
+            z-index: 100;
         }
 
-        .logo {
-            height: 35px;
+        /* Clase para ocultar el menú empujándolo hacia la izquierda */
+        .sidebar.collapsed {
+            margin-left: -260px;
         }
 
-        /* Capa translúcida para suavizar el fondo */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.75);
-            z-index: 1;
-        }
-
-        /* Barra de navegación superior */
-        .navbar {
-            position: relative;
-            z-index: 2;
+        .sidebar-header {
+            padding: 20px;
             background-color: #bd6464;
             color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .navbar .brand {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
 
-        .navbar .brand h1 {
-            font-size: 22px;
+        .sidebar-header h2 {
             margin: 0;
-            letter-spacing: 0.5px;
-            color: white;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .btn-logout {
-            background-color: white;
-            color: #bd6464;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            width: 100%;
-            text-align: left;
-        }
-
-        .btn-logout:hover {
-            background-color: black;
-            color: white;
-        }
-
-        /* Botón de Hamburguesa */
-        .hamburger-btn {
-            background: transparent;
-            border: 2px solid white;
-            color: white;
             font-size: 20px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
+            letter-spacing: 0.5px;
         }
 
-        .hamburger-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .user-profile {
+            padding: 20px;
+            border-bottom: 1px solid #f3f4f6;
         }
 
-        /* Menú Lateral Desplegable (Drawer) */
-        .side-drawer {
-            position: fixed;
-            top: 0;
-            right: -320px;
-            width: 300px;
-            height: 100%;
-            background-color: #ffffff;
-            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
-            z-index: 100;
-            transition: right 0.3s ease-in-out;
+        .user-profile-header {
             display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            padding: 25px;
-        }
-
-        .side-drawer.open {
-            right: 0;
-        }
-
-        .drawer-header {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #f3f4f6;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        .drawer-header h3 {
-            margin: 0;
-            color: #bd6464;
-            font-size: 18px;
+        .user-avatar {
+            background: #bd6464;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
         }
 
-        .close-drawer {
-            background: transparent;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
+        .user-info-text {
+            font-size: 12px;
             color: #4b5563;
+            background: #f9fafb;
+            padding: 8px;
+            border-radius: 6px;
+            line-height: 1.4;
         }
 
-        /* Enlaces y Submenús */
-        .drawer-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        /* --- ENLACES DEL MENÚ --- */
+        .sidebar-nav {
             flex: 1;
+            padding: 15px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            overflow-y: auto;
+            gap: 5px;
         }
 
-        .drawer-links a {
-            display: block;
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
             padding: 10px 15px;
             color: #1f2937;
             text-decoration: none;
             font-weight: 600;
             border-radius: 6px;
             font-size: 14px;
-            transition: background 0.2s, color 0.2s;
+            transition: all 0.2s;
         }
 
-        .drawer-links a:hover {
+        .sidebar-nav a:hover {
             background-color: #f3f4f6;
             color: #bd6464;
         }
 
-        /* Estilo para las subopciones */
         .submenu-item {
-            padding-left: 35px !important;
+            padding-left: 40px !important;
             font-size: 13px !important;
             color: #6b7280 !important;
             font-weight: 500 !important;
@@ -190,124 +124,194 @@
             color: #9ca3af;
         }
 
-        .submenu-item:hover {
-            color: #bd6464 !important;
-            background-color: #f9fafb !important;
+        /* --- BOTONES DE ACCIÓN --- */
+        .btn-create {
+            background-color: #bd6464;
+            color: white !important;
+            text-align: center;
+            justify-content: center;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(189, 100, 100, 0.2);
         }
 
-        /* Fondo oscuro al abrir el menú */
-        .drawer-overlay {
-            position: fixed;
+        .btn-create:hover {
+            background-color: #a05252 !important;
+            color: white !important;
+            transform: translateY(-1px);
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background-color: #fef2f2;
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-width: 0; /* Previene desbordamientos en flexbox */
+        }
+
+        /* Fondo translúcido aplicado solo al área de contenido, no al menú */
+        .main-wrapper::before {
+            content: "";
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: 99;
-            display: none;
+            background-image: url("{{ asset('img/Patron comercial.png') }}");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.25; /* Ajusta la opacidad del patrón aquí */
+            z-index: -1;
         }
 
-        .drawer-overlay.open {
-            display: block;
+        /* --- BARRA SUPERIOR (TOPBAR) --- */
+        .topbar {
+            background-color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .hamburger-btn {
+            background: transparent;
+            border: none;
+            color: #1f2937;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .hamburger-btn:hover {
+            color: #bd6464;
         }
 
         .badge-role {
             background-color: #16a34a;
             color: white;
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
             text-transform: uppercase;
         }
 
-        .badge-admin {
-            background-color: #1f2937;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
+        /* --- ÁREA DINÁMICA --- */
+        .content-area {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto; /* El scroll ocurre solo aquí, no en toda la página */
         }
     </style>
 </head>
 <body>
 
-<!-- Overlay oscuro de fondo al abrir el menú -->
-<div class="drawer-overlay" id="drawerOverlay" onclick="toggleMenu()"></div>
-
-<!-- Menú Lateral Desplegable (Hamburguesa) -->
-<div class="side-drawer" id="sideDrawer">
-    <div class="drawer-header">
-        <h3>Menú UPEMarket</h3>
-        <button class="close-drawer" onclick="toggleMenu()">&times;</button>
-    </div>
-
-    <!-- Datos del usuario -->
-    <div style="margin-bottom: 20px; border-bottom: 1px solid #f3f4f6; padding-bottom: 15px;">
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <a href="{{ route('profile.index') }}" style="background: #bd6464; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 16px;" title="Mi Perfil">👤</a>
-            <h4 style="margin: 0; color: #1f2937; font-size: 16px;">{{ Auth::user()?->nombre ?? 'Estudiante' }}</h4>
+    <!-- MENÚ LATERAL -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="{{ asset('img/Logo Completo UPEMarket.png') }}" alt="Logo" style="height: 25px;">
+            <h2>UPEM<strong style="color: #fff;">ARKET</strong></h2>
         </div>
-        <div style="font-size: 12px; color: #4b5563; background: #f3f4f6; padding: 8px 10px; border-radius: 6px; line-height: 1.4;">
-            <strong>Correo:</strong> {{ Auth::user()?->email }}<br>
-            <strong>Carrera:</strong> {{ Auth::user()?->carrera ?? 'No especificada' }}
+
+        <div class="user-profile">
+            <div class="user-profile-header">
+                <a href="{{ route('profile.index') }}" class="user-avatar" title="Mi Perfil">👤</a>
+                <h4 style="margin: 0; color: #1f2937; font-size: 16px;">{{ Auth::user()?->nombre ?? 'Estudiante' }}</h4>
+            </div>
+            <div class="user-info-text">
+                <strong>Correo:</strong> {{ Auth::user()?->email }}<br>
+                <strong>Carrera:</strong> {{ Auth::user()?->carrera ?? 'No especificada' }}
+            </div>
         </div>
-    </div>
 
-    <!-- Enlaces del Menú -->
-    <ul class="drawer-links">
-        <li><a href="{{ url('/publicaciones') }}">📦 Publicaciones</a></li>
-        <li><a href="{{ route('publications.my_posts') }}" class="submenu-item">Mis publicaciones</a></li>
+        <nav class="sidebar-nav">
+            <a href="{{ url('/') }}">🏠 Inicio</a>
+            
+            <!-- Grupo Publicaciones desglosado -->
+            <a href="{{ url('/publicaciones') }}" style="margin-top: 5px;">📦 Publicaciones</a>
+            <a href="{{ route('publications.my_posts') }}" class="submenu-item">Mis productos</a>
+            
+            <a href="{{ url('/categorias') }}" style="margin-top: 5px;">🏷️ Categorías</a>
+            <a href="{{ route('mensajes.index') }}" style="margin-top: 5px;">💬 Mensajes</a>
 
-        <li style="margin-top: 5px;"><a href="{{ url('/categorias') }}">🏷️ Categorías</a></li>
+            @if(Auth::user()?->rol === 'admin')
+                <a href="{{ route('users.management') }}" style="margin-top: 5px;">⚙️ Gestión Usuarios</a>
+            @endif
 
-        <!-- Botón de Chats / Mensajes Directos -->
-        <li style="margin-top: 5px;"><a href="{{ route('mensajes.index') }}">💬 Mensajes</a></li>
+            <!-- Botón destacado en el menú -->
+            <a href="{{ url('/publicaciones/crear') }}" class="btn-create">+ Crear Publicación</a>
+        </nav>
 
-        @if(Auth::user()?->rol === 'admin')
-            <li style="margin-top: 5px;"><a href="{{ route('users.management') }}">⚙️ Gestión de Usuarios</a></li>
-        @endif
-
-        <li style="margin-top: auto; border-top: 1px solid #f3f4f6; padding-top: 15px;">
+        <div class="sidebar-footer">
             <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                 @csrf
                 <button type="submit" class="btn-logout">Cerrar Sesión</button>
             </form>
-        </li>
-    </ul>
-</div>
+        </div>
+    </aside>
 
-<!-- Barra Superior Común -->
-<header class="navbar">
-    <div class="brand">
-        <img src="{{ asset('img/Logo Completo UPEMarket.png') }}" alt="Logo UPEMarket" class="logo">
-        <h1>UPEM<strong style="color: #ff0000">ARKET</strong></h1>
+    <!-- CONTENEDOR DERECHO (TopBar + Contenido) -->
+    <div class="main-wrapper">
+        
+        <header class="topbar">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <!-- Botón Hamburguesa que colapsa el menú -->
+                <button class="hamburger-btn" onclick="toggleSidebar()" title="Ocultar/Mostrar menú">☰</button>
+                <span style="color: #6b7280; font-weight: 500; font-size: 14px;">Panel de control</span>
+            </div>
+            
+            <div class="user-info">
+                @if(Auth::user()?->rol === 'admin')
+                    <span class="badge-role" style="background-color: #1f2937;">Administrador</span>
+                @else
+                    <span class="badge-role">Estudiante</span>
+                @endif
+            </div>
+        </header>
+
+        <!-- Aquí se inyectan las vistas de tu compañero -->
+        <main class="content-area">
+            {{ $slot }}
+        </main>
+
     </div>
-    <div class="user-info">
-        @if(Auth::user()?->rol === 'admin')
-            <span class="badge-admin">Administrador</span>
-        @else
-            <span class="badge-role">Estudiante</span>
-        @endif
 
-        <!-- Botón Hamburguesa que activa el menú -->
-        <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
-    </div>
-</header>
-
-<!-- Contenido Dinámico de las Vistas -->
-{{ $slot }}
-
-<!-- Script global para controlar la apertura y cierre del menú -->
-<script>
-    function toggleMenu() {
-        const drawer = document.getElementById('sideDrawer');
-        const overlay = document.getElementById('drawerOverlay');
-        drawer.classList.toggle('open');
-        overlay.classList.toggle('open');
-    }
-</script>
+    <!-- SCRIPT PARA COLAPSAR EL MENÚ -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            // La clase collapsed empuja el menú a margin-left: -260px, y el contenido principal toma ese espacio fluidamente
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
 </body>
 </html>

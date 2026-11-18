@@ -170,10 +170,15 @@
                         <select id="categoria_id" name="categoria_id" required>
                             <option value="">Selecciona una categoría</option>
                             <option value="Tecnología" {{ old('categoria_id') == 'Tecnología' ? 'selected' : '' }}>Tecnología / Electrónica</option>
-                            <option value="Libros" {{ old('categoria_id') == 'Libros' ? 'selected' : '' }}>Libros y Apuntes</option>
-                            <option value="Ropa" {{ old('categoria_id') == 'Ropa' ? 'selected' : '' }}>Ropa y Uniformes</option>
-                            <option value="Servicios" {{ old('categoria_id') == 'Servicios' ? 'selected' : '' }}>Servicios Académicos</option>
-                            <option value="Varios" {{ old('categoria_id') == 'Varios' ? 'selected' : '' }}>Varios</option>
+                            <option value="Libros" {{ old('categoria_id') == 'Libros' ? 'selected' : '' }}>Libros</option>
+                            <option value="Ropa" {{ old('categoria_id') == 'Ropa' ? 'selected' : '' }}>Ropa</option>
+                            {{-- belleza y cuidado personal --}}
+                            <option value="Belleza" {{ old('categoria_id') == 'Belleza' ? 'selected' : '' }}>Belleza y Cuidado Personal</option>
+                            {{-- servicios --}}
+                            <option value="Servicios" {{ old('categoria_id') == 'Servicios' ? 'selected' : '' }}>Servicios </option>
+                            {{-- comida --}}
+                            <option value="Comida" {{ old('categoria_id') == 'Comida' ? 'selected' : '' }}>Comida y Bebidas</option>
+                            <option value="Otros" {{ old('categoria_id') == 'Otros' ? 'selected' : '' }}>Otros</option>
                         </select>
                         @error('categoria_id')
                         <div class="error-message">{{ $message }}</div>

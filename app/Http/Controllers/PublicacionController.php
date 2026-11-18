@@ -113,15 +113,27 @@ class PublicacionController extends Controller
     }
 
     // Cambiar el estatus de una publicación y/o datos
-    public function editarFormulario($id)
+    // Mostrar el formulario para editar una publicación existente
+    public function editar($id)
     {
-        $publicacion = \App\Models\Publicacion::find($id);
+        try {
+            $publicacion = Publicacion::findOrFail($id);
 
-        if (!$publicacion || $publicacion->usuario_id !== auth()->id()) {
-            return redirect('/mis-publicaciones')->with('error', 'No autorizado o publicación no encontrada.');
+            // Verificar que solo el dueño o un admin pueda entrar a editar
+            $esDueno = (string) $publicacion->usuario_id === (string) auth()->id();
+            $esAdmin = auth()->user()?->rol === 'admin';
+
+            if (!$esDueno && !$esAdmin) {
+                return redirect('/publicaciones')->with('error', 'No tienes permiso para editar esta publicación.');
+            }
+
+            $categorias = \App\Models\Categoria::all();
+
+            return view('publications.edit', compact('publicacion', 'categorias'));
+
+        } catch (\Exception $e) {
+            return redirect('/publicaciones')->with('error', 'No se encontró la publicación solicitada.');
         }
-
-        return view('publications.edit', compact('publicacion'));
     }
 
     public function actualizar(Request $request, $id)
@@ -129,7 +141,7 @@ class PublicacionController extends Controller
         $publicacion = Publicacion::find($id);
 
         if (!$publicacion || $publicacion->usuario_id !== auth()->id()) {
-            return redirect('/mis-publicaciones')->with('error', 'Acción no autorizada.');
+            return redirect()->route('publications.my_posts')->with('error', 'Acción no autorizada.');
         }
 
         $request->validate([
@@ -153,8 +165,7 @@ class PublicacionController extends Controller
         }
 
         $publicacion->save();
-
-        return redirect('/mis-publicaciones')->with('success', '¡Artículo actualizado con éxito!');
+        return redirect()->route('publications.my_posts')->with('success', '¡Artículo actualizado con éxito!');
     }
 
     public function eliminar(Request $request, $id){

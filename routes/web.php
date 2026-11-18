@@ -28,8 +28,12 @@
         Route::get('/publicaciones/crear', function () {
             return view('publications.create');
         })->name('publications.create');
-
         Route::get('/publicaciones/{id}', [PublicacionController::class, 'mostrar'])->name('publications.show');
+        //publicaciones editar
+        Route::get('/publicaciones/{id}/editar', [PublicacionController::class, 'editar'])->name('publications.edit');
+        Route::put('/publicaciones/{id}', [PublicacionController::class, 'actualizar'])->name('publications.update');
+        Route::get('/publicaciones/{id}/eliminar', [PublicacionController::class, 'eliminar'])->name('publications.delete');
+
         Route::post('/publicaciones', [PublicacionController::class, 'crear']);
         Route::put('/publicaciones/{id}', [PublicacionController::class, 'actualizar']);
         Route::delete('/publicaciones/{id}', [PublicacionController::class, 'eliminar']);

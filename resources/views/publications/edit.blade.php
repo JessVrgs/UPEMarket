@@ -187,11 +187,12 @@
                         <label for="categoria_id">Categoría</label>
                         <select id="categoria_id" name="categoria_id" required>
                             <option value="">Selecciona una categoría</option>
-                            <option value="Tecnología" {{ old('categoria_id', $publicacion->categoria_id) == 'Tecnología' ? 'selected' : '' }}>Tecnología / Electrónica</option>
-                            <option value="Libros" {{ old('categoria_id', $publicacion->categoria_id) == 'Libros' ? 'selected' : '' }}>Libros y Apuntes</option>
-                            <option value="Ropa" {{ old('categoria_id', $publicacion->categoria_id) == 'Ropa' ? 'selected' : '' }}>Ropa y Uniformes</option>
-                            <option value="Servicios" {{ old('categoria_id', $publicacion->categoria_id) == 'Servicios' ? 'selected' : '' }}>Servicios Académicos</option>
-                            <option value="Varios" {{ old('categoria_id', $publicacion->categoria_id) == 'Varios' ? 'selected' : '' }}>Varios</option>
+                            @foreach($categorias as $cat)
+                                <option value="{{ $cat->id ?? $cat->_id }}" 
+                                    {{ old('categoria_id', $publicacion->categoria_id) == ($cat->id ?? $cat->_id) ? 'selected' : '' }}>
+                                    {{ $cat->nombre }}
+                                </option>
+                            @endforeach
                         </select>
                         @error('categoria_id')
                         <div class="error-message">{{ $message }}</div>

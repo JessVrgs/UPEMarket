@@ -8,97 +8,48 @@ use App\Models\Publicacion;
 
 class FavoritoController extends Controller
 {
-    public function agregarFavorito(Request $request){
-        try{
-            $request->validate([
-                'publicacion_id' => 'required|string'
-            ]);
+    // Muestra la vista con todas las publicaciones favoritas del usuario
+    public function index()
+    {
+        $usuarioId = (string) auth()->id();
 
-            $usuario_id = auth()->user()->id;
+        $favoritos = Favorito::where('usuario_id', $usuarioId)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-            if (!Publicacion::find($request->publicacion_id)) {
-                return response()->json([
-                    'estado' => 'Error', 
-                    'mensaje' => 'La publicación no existe.'
-                ], 404);
-            }
+        $publicacionIds = $favoritos->pluck('publicacion_id')->toArray();
 
-            //evitar duplicar un favorito
-            $existe = Favorito::where('usuario_id', $usuario_id)
-                ->where('publicacion_id', $request->publicacion_id)
-                ->first();
+        $publicaciones = Publicacion::whereIn('_id', $publicacionIds)
+            ->where('oculta', false)
+            ->get();
 
-            if ($existe) {
-                return response()->json([
-                    'estado' => 'Advertencia', 
-                    'mensaje' => 'Ya tienes este producto en favoritos.'
-                ]);
-            }
-
-            $favorito = new Favorito();
-            $favorito->usuario_id = $usuario_id;
-            $favorito->publicacion_id = $request->publicacion_id;
-            $favorito->save();
-
-            return response()->json([
-                'estado' => 'Éxito', 
-                'mensaje' => 'Guardado en favoritos.'
-            ]);
-        } catch(\Exception $e){
-            return response()->json([
-                'estado'    => 'Error',
-                'mensaje'   => 'NO se pudo guardar'
-            ], 500);
-        }
+        return view('publications.favorites', compact('publicaciones'));
     }
 
-    public function consultarFavoritos() {
-        try {
-            $usuario_id = auth()->user()->id;
+    // Guarda o quita una publicación de favoritos al darle clic a la estrella
+    public function toggle($publicacionId)
+    {
+        $usuarioId = (string) auth()->id();
+        $pubId = (string) $publicacionId;
 
-            $favoritos = Favorito::where('usuario_id', $usuario_id)
-                ->with('publicacion')
-                ->get();
-
-            return response()->json([
-                'estado' => 'Éxito', 
-                'datos' => $favoritos
-            ]);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'estado' => 'Error', 
-                'mensaje' => 'Error al cargar favoritos.'
-            ], 500);
+        if (!Publicacion::find($pubId)) {
+            return back()->with('error', 'La publicación no existe.');
         }
-    }
 
-    public function eliminarFavorito($publicacion_id) {
-        try {
-            $usuario_id = auth()->user()->id;
+        $existente = Favorito::where('usuario_id', $usuarioId)
+            ->where('publicacion_id', $pubId)
+            ->first();
 
-            $favorito = Favorito::where('usuario_id', $usuario_id)
-                ->where('publicacion_id', $publicacion_id)
-                ->first();
-
-            if ($favorito) {
-                $favorito->delete();
-                return response()->json([
-                    'estado' => 'Éxito', 
-                    'mensaje' => 'Eliminado de favoritos.'
-                ]);
-            }
-
-            return response()->json([
-                'estado' => 'Error', 
-                'mensaje' => 'No se encontró en favoritos.'
-            ], 404);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'estado' => 'Error', 
-                'mensaje' => 'Error al eliminar.'
-            ], 500);
+        if ($existente) {
+            $existente->delete();
+            return back()->with('success', 'Eliminado de tus favoritos.');
         }
+
+        Favorito::create([
+            'usuario_id'     => $usuarioId,
+            'publicacion_id' => $pubId,
+        ]);
+
+        return back()->with('success', '⭐ ¡Guardado en tus favoritos!');
     }
 }

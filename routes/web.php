@@ -5,6 +5,7 @@
     use App\Http\Controllers\PublicacionController;
     use App\Http\Controllers\CategoriaController;
     use App\Http\Controllers\ConversacionController;
+    use App\Http\Controllers\FavoritoController;
 
     Route::get('/', function () {
         return view('welcome');
@@ -51,6 +52,10 @@
         Route::get('/publications', function () {
             return view('publications.my_posts');
         })->name('publications.my_posts');
+
+        // FAVORITOS
+        Route::get('/favoritos', [FavoritoController::class, 'index'])->name('favorites.index');
+        Route::post('/favoritos/{id}', [FavoritoController::class, 'toggle'])->name('favorites.toggle');
 
         // CATEGORÍAS
         Route::get('/categorias', [CategoriaController::class, 'consultar']);

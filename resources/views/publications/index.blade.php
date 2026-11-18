@@ -211,6 +211,30 @@
             color: #1f2937;
             background-color: #f3f4f6;
         }
+
+        .fav-btn-card {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.92);
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #f59e0b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.15s;
+            z-index: 5;
+        }
+
+        .fav-btn-card:hover {
+            transform: scale(1.12);
+        }
     </style>
 
     <div class="marketplace-container">
@@ -245,9 +269,27 @@
         <!-- Cuadrícula de Artículos -->
         <div class="products-grid">
 
+            @php
+                $misFavoritosIds = \App\Models\Favorito::where('usuario_id', (string) auth()->id())
+                    ->pluck('publicacion_id')
+                    ->toArray();
+            @endphp
+
             @forelse($publicaciones ?? [] as $pub)
-                <div class="product-card">
-                    <a href="{{ route('publications.show', $pub->_id ?? $pub->id) }}" class="product-card">
+                @php
+                    $pubId = (string) ($pub->_id ?? $pub->id);
+                    $esFavorito = in_array($pubId, $misFavoritosIds);
+                @endphp
+
+                <div class="product-card" style="position: relative;">
+                    <form action="{{ route('favorites.toggle', $pubId) }}" method="POST" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="fav-btn-card" title="{{ $esFavorito ? 'Quitar de favoritos' : 'Guardar en favoritos' }}">
+                            {{ $esFavorito ? '⭐' : '☆' }}
+                        </button>
+                    </form>
+
+                    <a href="{{ route('publications.show', $pubId) }}" class="product-card" style="border: none; box-shadow: none;">
                         <div class="product-image-container">
                             <img src="{{ $pub->foto ?? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80' }}" alt="Producto">
                             <span class="product-price">${{ number_format($pub->precio ?? 0, 2) }}</span>
@@ -260,7 +302,6 @@
                     </a>
                 </div>
             @empty
-                <!-- Estado vacío -->
                 <div class="empty-state">
                     @if(request()->filled('buscar') || request()->filled('categoria_id'))
                         <h3 style="color: #bd6464; margin-top: 0;">No se encontraron resultados</h3>

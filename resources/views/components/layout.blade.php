@@ -280,12 +280,13 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="{{ url('/') }}">🏠 Inicio</a>
+           <!--  <a href="{{ url('/') }}">🏠 Inicio</a>-->
             
             <a href="{{ url('/publicaciones') }}" style="margin-top: 5px;">📦 Publicaciones</a>
             <a href="{{ route('publications.my_posts') }}" class="submenu-item">Mis productos</a>
-            
+
             <a href="{{ url('/categorias') }}" style="margin-top: 5px;">🏷️ Categorías</a>
+            <a href="{{ route('favorites.index') }}" style="margin-top: 5px;">⭐ Mis favoritos</a>
             <a href="{{ route('mensajes.index') }}" style="margin-top: 5px;">💬 Mensajes</a>
 
             @if(Auth::user()?->rol === 'admin')

@@ -252,6 +252,20 @@
                     <h1 class="detail-title">{{ $publicacion->titulo }}</h1>
                     <div class="detail-price">${{ number_format($publicacion->precio, 2) }} MXN</div>
 
+                    @php
+                        $pubId = (string) ($publicacion->_id ?? $publicacion->id);
+                        $esFavorito = \App\Models\Favorito::where('usuario_id', (string) auth()->id())
+                            ->where('publicacion_id', $pubId)
+                            ->exists();
+                    @endphp
+
+                    <form action="{{ route('favorites.toggle', $pubId) }}" method="POST" style="margin-bottom: 20px;">
+                        @csrf
+                        <button type="submit" style="background-color: {{ $esFavorito ? '#fef3c7' : '#f3f4f6' }}; color: {{ $esFavorito ? '#b45309' : '#374151' }}; border: 1px solid {{ $esFavorito ? '#fcd34d' : '#d1d5db' }}; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            {{ $esFavorito ? '⭐ Guardado en Favoritos' : '☆ Guardar en Favoritos' }}
+                        </button>
+                    </form>
+
                     <div class="section-box">
                         <h4>Descripción del Artículo</h4>
                         <p>{{ $publicacion->descripcion }}</p>

@@ -285,7 +285,7 @@
             <a href="{{ url('/publicaciones') }}" style="margin-top: 5px;">📦 Publicaciones</a>
             <a href="{{ route('publications.my_posts') }}" class="submenu-item">Mis productos</a>
 
-            <a href="{{ url('/categorias') }}" style="margin-top: 5px;">🏷️ Categorías</a>
+            {{-- <a href="{{ url('/categorias') }}" style="margin-top: 5px;">🏷️ Categorías</a> --}}
             <a href="{{ route('favorites.index') }}" style="margin-top: 5px;">⭐ Mis favoritos</a>
             <a href="{{ route('mensajes.index') }}" style="margin-top: 5px;">💬 Mensajes</a>
 
@@ -304,12 +304,12 @@
         </div>
     </aside>
 
-    <!-- CONTENEDOR DERECHO (TopBar + Contenido) -->
+    <!-- MENU DERECHO ( -->
     <div class="main-wrapper" id="mainWrapper">
         
         <header class="topbar">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <!-- Botón Hamburguesa -->
+                <!-- anbunguesita -->
                 <button class="hamburger-btn" onclick="toggleSidebar()" title="Ocultar/Mostrar menú">☰</button>
                 <span style="color: #6b7280; font-weight: 500; font-size: 14px;">Panel de control</span>
             </div>
@@ -329,7 +329,7 @@
 
     </div>
 
-    <!-- SCRIPT PARA COLAPSAR EL MENÚ DE FORMA INTELIGENTE -->
+    <!-- COLAPSAR EL MENÚ -->
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -345,10 +345,17 @@
         }
 
         // Cierra el menú en móvil si se hace clic fuera del sidebar
-        document.getElementById('mainWrapper').addEventListener('click', function(e) {
+        document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-open')) {
-                // Oculta el menú si se hace clic en el área principal
+            const hamburgerBtn = document.querySelector('.hamburger-btn'); 
+            
+            // Verificamos si es móvil, si el menú está abierto, y si el clic NO fue dentro del sidebar ni en el botón hamburguesa
+            if (window.innerWidth <= 768 && 
+                sidebar.classList.contains('mobile-open') && 
+                !sidebar.contains(event.target) && 
+                !hamburgerBtn.contains(event.target)) {
+                
+                // Oculta el menú si se hace clic afuera
                 sidebar.classList.remove('mobile-open');
             }
         });

@@ -270,13 +270,18 @@
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <!-- Selector de categorías -->
-                    <select name="categoria_id" class="search-input" style="min-width: 160px;">
-                        <option value="">Todas las categorías</option>
-                        <option value="Tecnología" {{ request('categoria_id') == 'Tecnología' ? 'selected' : '' }}>Tecnología / Electrónica</option>
-                        <option value="Libros" {{ request('categoria_id') == 'Libros' ? 'selected' : '' }}>Libros y Apuntes</option>
-                        <option value="Ropa" {{ request('categoria_id') == 'Ropa' ? 'selected' : '' }}>Ropa y Uniformes</option>
-                        <option value="Servicios" {{ request('categoria_id') == 'Servicios' ? 'selected' : '' }}>Servicios Académicos</option>
-                        <option value="Varios" {{ request('categoria_id') == 'Varios' ? 'selected' : '' }}>Varios</option>
+                    <select id="categoria_id" name="categoria_id">
+                            <option value="">Selecciona una categoría</option>
+                            <option value="Tecnología" {{ old('categoria_id') == 'Tecnología' ? 'selected' : '' }}>Tecnología / Electrónica</option>
+                            <option value="Libros" {{ old('categoria_id') == 'Libros' ? 'selected' : '' }}>Libros</option>
+                            <option value="Ropa" {{ old('categoria_id') == 'Ropa' ? 'selected' : '' }}>Ropa</option>
+                            {{-- belleza y cuidado personal --}}
+                            <option value="Belleza" {{ old('categoria_id') == 'Belleza' ? 'selected' : '' }}>Belleza y Cuidado Personal</option>
+                            {{-- servicios --}}
+                            <option value="Servicios" {{ old('categoria_id') == 'Servicios' ? 'selected' : '' }}>Servicios </option>
+                            {{-- comida --}}
+                            <option value="Comida" {{ old('categoria_id') == 'Comida' ? 'selected' : '' }}>Comida y Bebidas</option>
+                            <option value="Otros" {{ old('categoria_id') == 'Otros' ? 'selected' : '' }}>Otros</option>
                     </select>
 
                     <button type="submit" class="btn-search">🔍 Buscar</button>

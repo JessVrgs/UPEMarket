@@ -226,6 +226,22 @@
                 padding: 25px;
             }
         }
+
+        .status-tag {
+            background-color: #16a34a;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .status-tag.paused {
+            background-color: #ca8a04;
+        }
     </style>
 
     <div class="detail-container">
@@ -248,7 +264,12 @@
             <!-- Información detallada -->
             <div class="detail-info">
                 <div>
-                    <span class="category-tag">{{ $publicacion->categoria_id ?? 'General' }}</span>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+                        <span class="category-tag" style="margin-bottom: 0;">{{ $publicacion->categoria_id ?? 'General' }}</span>
+                        <span class="status-tag {{ $publicacion->estado === 'pausado' ? 'paused' : '' }}">
+                            {{ $publicacion->estado ?? 'disponible' }}
+                        </span>
+                    </div>
                     <h1 class="detail-title">{{ $publicacion->titulo }}</h1>
                     <div class="detail-price">${{ number_format($publicacion->precio, 2) }} MXN</div>
 

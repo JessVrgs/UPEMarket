@@ -198,7 +198,7 @@
                     <label for="foto">Fotografía del Artículo (Permite alta resolución)</label>
                     <div class="file-upload-box" onclick="document.getElementById('foto').click()">
                         <span style="font-size: 36px; display: block; margin-bottom: 10px;">📷</span>
-                        <span style="font-size: 15px; color: #4b5563; font-weight: 500;" id="file-label">Haz clic aquí para seleccionar o arrastrar tu imagen (PNG, JPG)</span>
+                        <span style="font-size: 15px; color: #4b5563; font-weight: 500;" id="file-label">Haz clic aquí para seleccionar tu imagen (PNG, JPG)</span>
                         <input type="file" id="foto" name="foto" accept="image/png, image/jpeg, image/jpg" required style="display: none;" onchange="updateFileName(this)">
                     </div>
                     @error('foto')

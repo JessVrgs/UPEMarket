@@ -177,7 +177,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="precio">Precio ($ MXN)</label>
-                        <input type="number" step="0.01" min="0" id="precio" name="precio" value="{{ old('precio', $publicacion->precio) }}" required>
+                        <input type="number" step="1" min="0" id="precio" name="precio" value="{{ old('precio', $publicacion->precio) }}" required>
                         @error('precio')
                         <div class="error-message">{{ $message }}</div>
                         @enderror
@@ -187,12 +187,14 @@
                         <label for="categoria_id">Categoría</label>
                         <select id="categoria_id" name="categoria_id" required>
                             <option value="">Selecciona una categoría</option>
-                            @foreach($categorias as $cat)
-                                <option value="{{ $cat->id ?? $cat->_id }}" 
-                                    {{ old('categoria_id', $publicacion->categoria_id) == ($cat->id ?? $cat->_id) ? 'selected' : '' }}>
-                                    {{ $cat->nombre }}
-                                </option>
-                            @endforeach
+                            <option value="Tecnología" {{ old('categoria_id', $publicacion->categoria_id) == 'Tecnología' ? 'selected' : '' }}>Tecnología / Electrónica</option>
+                            <option value="Libros" {{ old('categoria_id', $publicacion->categoria_id) == 'Libros' ? 'selected' : '' }}>Libros</option>
+                            <option value="Ropa" {{ old('categoria_id', $publicacion->categoria_id) == 'Ropa' ? 'selected' : '' }}>Ropa</option>
+                            <option value="Belleza" {{ old('categoria_id', $publicacion->categoria_id) == 'Belleza' ? 'selected' : '' }}>Belleza y Cuidado Personal</option>
+                            <option value="Servicios" {{ old('categoria_id', $publicacion->categoria_id) == 'Servicios' ? 'selected' : '' }}>Servicios</option>
+                            <option value="Comida" {{ old('categoria_id', $publicacion->categoria_id) == 'Comida' ? 'selected' : '' }}>Comida y Bebidas</option>
+                            <option value="Varios" {{ old('categoria_id', $publicacion->categoria_id) == 'Varios' ? 'selected' : '' }}>Varios</option>
+                            <option value="Otros" {{ old('categoria_id', $publicacion->categoria_id) == 'Otros' ? 'selected' : '' }}>Otros</option>
                         </select>
                         @error('categoria_id')
                         <div class="error-message">{{ $message }}</div>

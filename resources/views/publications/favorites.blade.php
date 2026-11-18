@@ -153,6 +153,24 @@
             display: inline-block;
             margin-top: 15px;
         }
+
+        .product-status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #16a34a;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-status.paused {
+            background: #ca8a04;
+        }
     </style>
 
     <div class="favorites-container">
@@ -180,11 +198,14 @@
                         <div class="product-image-container">
                             <img src="{{ $pub->foto ?? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80' }}" alt="Producto">
                             <span class="product-price">${{ number_format($pub->precio ?? 0, 2) }}</span>
+                            <span class="product-status {{ $pub->estado === 'pausado' ? 'paused' : '' }}">
+                                {{ $pub->estado ?? 'disponible' }}
+                            </span>
                         </div>
                         <div class="product-info">
                             <span class="product-category">{{ $pub->categoria_id ?? 'General' }}</span>
                             <h3 class="product-title">{{ $pub->titulo ?? 'Sin título' }}</h3>
-                            <p class="product-location">📍 Comunidad UPEMOR</p>
+                            <p class="product-location">📅 {{ $pub->created_at ? $pub->created_at->setTimezone('America/Mexico_City')->format('d/m/Y h:i A') : 'Reciente' }}</p>
                         </div>
                     </a>
                 </div>
